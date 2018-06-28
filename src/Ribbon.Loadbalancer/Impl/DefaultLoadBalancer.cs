@@ -24,7 +24,7 @@ namespace Ribbon.LoadBalancer.Impl
             _ping = ping;
             ServerList = serverList;
 
-            var updatedListOfServers = serverList?.GetUpdatedListOfServers();
+            var updatedListOfServers = serverList?.GetUpdatedListOfServersAsync().GetAwaiter().GetResult();
             while (_servers.TryPeek(out _))
             {
             }

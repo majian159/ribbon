@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Ribbon.LoadBalancer
 {
-    public interface IServerList<out T> where T : Server
+    public interface IServerList<T> where T : Server
     {
-        IReadOnlyList<T> GetInitialListOfServers();
+        Task<IReadOnlyList<T>> GetInitialListOfServersAsync();
 
-        IReadOnlyList<T> GetUpdatedListOfServers();
+        Task<IReadOnlyList<T>> GetUpdatedListOfServersAsync();
     }
 }
