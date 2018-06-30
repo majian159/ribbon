@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ribbon.Consul", "src\Ribbon
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Steeltoe.Discovery.ConsulBase", "..\steeltoe-extensions\src\discovery\Steeltoe.Discovery.ConsulBase\Steeltoe.Discovery.ConsulBase.csproj", "{7FCCF978-2DEE-4B1B-978C-D99ED66A4A3D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ribbon.LoadBalancer.Abstractions", "src\Ribbon.LoadBalancer.Abstractions\Ribbon.LoadBalancer.Abstractions.csproj", "{4098746C-95AA-4E29-9C5A-71CE3060C0F4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{7FCCF978-2DEE-4B1B-978C-D99ED66A4A3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7FCCF978-2DEE-4B1B-978C-D99ED66A4A3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7FCCF978-2DEE-4B1B-978C-D99ED66A4A3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4098746C-95AA-4E29-9C5A-71CE3060C0F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4098746C-95AA-4E29-9C5A-71CE3060C0F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4098746C-95AA-4E29-9C5A-71CE3060C0F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4098746C-95AA-4E29-9C5A-71CE3060C0F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

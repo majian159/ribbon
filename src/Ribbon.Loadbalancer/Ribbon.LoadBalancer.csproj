@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Ribbon.Core\Ribbon.Core.csproj" />
+    <ProjectReference Include="..\Ribbon.LoadBalancer.Abstractions\Ribbon.LoadBalancer.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>
