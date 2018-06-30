@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\src\Ribbon.Client.Http\Ribbon.Client.Http.csproj" />
     <ProjectReference Include="..\src\Ribbon.Client\Ribbon.Client.csproj" />
+    <ProjectReference Include="..\src\Ribbon.Consul\Ribbon.Consul.csproj" />
     <ProjectReference Include="..\src\Ribbon.Loadbalancer\Ribbon.LoadBalancer.csproj" />
   </ItemGroup>
 

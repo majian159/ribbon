@@ -25,7 +25,7 @@ namespace Ribbon.LoadBalancer
         {
             var host = server.Host;
             var port = server.Port;
-            var scheme = server.Scheme;
+            var scheme = server.Scheme ?? originalUri.Scheme;
 
             if (originalUri.IsAbsoluteUri && string.Equals(scheme, originalUri.Scheme, StringComparison.OrdinalIgnoreCase) &&
                 string.Equals(host, originalUri.Host, StringComparison.OrdinalIgnoreCase) && port == server.Port)

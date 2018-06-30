@@ -122,7 +122,7 @@ namespace Ribbon.LoadBalancer
             }
         }
 
-        public IMetaInfo MetaInfo { get; }
+        public virtual IMetaInfo MetaInfo { get; }
 
         private static (string Scheme, string Host, int Port)? GetSchemeHostPort(string id)
         {

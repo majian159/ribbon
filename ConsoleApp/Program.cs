@@ -1,24 +1,25 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Consul;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Ribbon.Client;
 using Ribbon.Client.Http;
 using Ribbon.Client.Http.Options;
 using Ribbon.Client.Options;
+using Ribbon.Consul;
 using Ribbon.LoadBalancer;
+using Steeltoe.Discovery.Consul.Discovery;
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Sockets;
 using System.Threading;
 
 namespace ConsoleApp
 {
     internal class Program
     {
+
         private static void Main(string[] args)
         {
-
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
@@ -33,6 +34,7 @@ namespace ConsoleApp
 
             var serviceCollection = new ServiceCollection()
                 .AddOptions()
+                .AddSingleton(new ConsulClient(s => s.Address = new Uri("http://192.168.100.150:8500")))
                 .AddHttpClient()
                 .AddSingleton<IConfiguration>(configuration)
                 .ConfigureOptions<HttpClientFactoryOptionsSetup>()
@@ -40,16 +42,13 @@ namespace ConsoleApp
                 .ConfigureOptions<RibbonOptionsSetup<LoadBalancerConfig>>()
                 .ConfigureOptions<LoadBalancerClientOptionsSetup>()
                 .ConfigureOptions<LoadBalancerOptionsSetup>()
-                .ConfigureOptions<RibbonHttpClientOptionsSetup>();
+                .ConfigureOptions<RibbonHttpClientOptionsSetup>()
+                .ConfigureOptions<ConsulLoadBalancerOptionsSetup>();
 
             var services = serviceCollection.BuildServiceProvider();
 
-
-
             var rcom = services.GetService<IOptionsMonitor<RibbonHttpClientOptions>>();
-            var rco = rcom.Get("client1");
-
-            
+            var rco = rcom.Get("cs.wechat");
 
             var client = new RibbonHttpClient(rco.HttpClient);
 
@@ -57,9 +56,9 @@ namespace ConsoleApp
 
             while (true)
             {
-                var t = client.ExecuteAsync<HttpRequest, IHttpResponse>(new HttpRequest(new Uri("http://t")), new ExecuteOptions()).GetAwaiter()
+                var t = client.ExecuteAsync<HttpRequest, IHttpResponse>(new HttpRequest(new Uri("http://t/accessToken/wx52320fa3039da0ab")), new ExecuteOptions()).GetAwaiter()
                     .GetResult();
-                Console.WriteLine(t.StatusLine+t.RequestedUri);
+                Console.WriteLine(t.Content.ReadAsStringAsync().GetAwaiter().GetResult());
                 Console.ReadLine();
                 // robbinHttpClient.
 

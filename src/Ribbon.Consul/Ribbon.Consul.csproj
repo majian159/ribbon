@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\steeltoe-extensions\src\discovery\Steeltoe.Discovery.ConsulBase\Steeltoe.Discovery.ConsulBase.csproj" />
+    <ProjectReference Include="..\Ribbon.Loadbalancer\Ribbon.LoadBalancer.csproj" />
+  </ItemGroup>
+
+</Project>

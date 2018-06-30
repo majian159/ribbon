@@ -12,6 +12,8 @@ namespace Ribbon.Client.Http.Options
 
         internal class HttpClientFactoryConfig
         {
+            public static readonly HttpClientFactoryConfig Default = new HttpClientFactoryConfig();
+
             public HttpClientFactoryConfig()
             {
                 Timeout = TimeSpan.FromSeconds(10);
@@ -45,7 +47,7 @@ namespace Ribbon.Client.Http.Options
         {
             var ribbonSection = _configuration?.GetSection(name)?.GetSection("ribbon");
 
-            var config = ribbonSection == null ? new HttpClientFactoryConfig() : ribbonSection.Get<HttpClientFactoryConfig>();
+            var config = ribbonSection == null ? new HttpClientFactoryConfig() : ribbonSection.Get<HttpClientFactoryConfig>() ?? HttpClientFactoryConfig.Default;
 
             options.HttpClientActions.Add(s =>
             {
