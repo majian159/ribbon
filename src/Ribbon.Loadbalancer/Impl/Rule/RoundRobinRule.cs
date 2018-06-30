@@ -4,7 +4,7 @@ namespace Ribbon.LoadBalancer.Impl.Rule
 {
     public class RoundRobinRule : IRule
     {
-        private long _nextServerCyclicCounter;
+        private long _nextServerCyclicCounter = -1;
 
         public RoundRobinRule()
         {
