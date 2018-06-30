@@ -32,10 +32,17 @@ namespace Ribbon.Consul
         /// <inheritdoc/>
         public void Configure(string name, LoadBalancerOptions options)
         {
-            if (options.ServerList != null) return;
+            var serverListTypeName = options.Settings.LoadBalancerServerListTypeName;
+            var pingTypeName = options.Settings.LoadBalancerPingTypeName;
 
-            options.ServerList = new ConsulServiceList(name, _services.GetService<ConsulClient>(), _services.GetService<IOptionsMonitor<ConsulDiscoveryOptions>>());
-            if (options.Ping == null)
+            if (serverListTypeName == null || Type.GetType(serverListTypeName) != typeof(ConsulServerList))
+            {
+                return;
+            }
+
+            options.ServerList = new ConsulServerList(name, _services.GetService<ConsulClient>(), _services.GetService<IOptions<ConsulDiscoveryOptions>>());
+
+            if (pingTypeName == null || Type.GetType(pingTypeName) == typeof(ConsulPing))
             {
                 options.Ping = Ping;
             }

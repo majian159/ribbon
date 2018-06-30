@@ -8,7 +8,6 @@ using Ribbon.Client.Http.Options;
 using Ribbon.Client.Options;
 using Ribbon.Consul;
 using Ribbon.LoadBalancer;
-using Steeltoe.Discovery.Consul.Discovery;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -17,7 +16,6 @@ namespace ConsoleApp
 {
     internal class Program
     {
-
         private static void Main(string[] args)
         {
             var configuration = new ConfigurationBuilder()
@@ -28,7 +26,8 @@ namespace ConsoleApp
                     {"client1:ribbon:OkToRetryOnAllOperations","true" },
                     {"client1:ribbon:ListOfServers:0","https://www.baidu.com" },
                     {"client1:ribbon:ListOfServers:1","http://www.baidu.com" },
-                    {"client1:ribbon:Timeout","00:02:00" }
+                    {"client1:ribbon:Timeout","00:02:00" },
+                    {"cs.wechat:ribbon:LoadBalancerServerListTypeName",typeof(ConsulServerList).FullName }
                 })
                 .Build();
 
@@ -48,9 +47,11 @@ namespace ConsoleApp
             var services = serviceCollection.BuildServiceProvider();
 
             var rcom = services.GetService<IOptionsMonitor<RibbonHttpClientOptions>>();
-            var rco = rcom.Get("client1");
+            var rco = rcom.Get("cs.wechat");
+            var rco2 = rcom.Get("client1");
 
             var client = new RibbonHttpClient(rco.HttpClient);
+            var client2 = new RibbonHttpClient(rco2.HttpClient);
 
             Thread.Sleep(1000);
 
@@ -59,6 +60,11 @@ namespace ConsoleApp
                 var t = client.ExecuteAsync<HttpRequest, IHttpResponse>(new HttpRequest(new Uri("http://t/accessToken/wx52320fa3039da0ab")), new ExecuteOptions()).GetAwaiter()
                     .GetResult();
                 Console.WriteLine(t.Content.ReadAsStringAsync().GetAwaiter().GetResult());
+
+                t = client2.ExecuteAsync<HttpRequest, IHttpResponse>(new HttpRequest(new Uri("http://t/")), new ExecuteOptions()).GetAwaiter()
+                    .GetResult();
+                Console.WriteLine(t.Content.ReadAsStringAsync().GetAwaiter().GetResult());
+
                 Console.ReadLine();
                 // robbinHttpClient.
 

@@ -8,17 +8,17 @@ using System.Threading.Tasks;
 
 namespace Ribbon.Consul
 {
-    public class ConsulServiceList : IServerList<Server>
+    public class ConsulServerList : IServerList<Server>
     {
         private readonly string _clientName;
         private readonly ConsulClient _consulClient;
         private readonly ConsulDiscoveryOptions _consulDiscoveryOptions;
 
-        public ConsulServiceList(string clientName, ConsulClient consulClient, IOptionsMonitor<ConsulDiscoveryOptions> consulDiscoveryOptionsMonitor)
+        public ConsulServerList(string clientName, ConsulClient consulClient, IOptions<ConsulDiscoveryOptions> optionsAccessor)
         {
             _clientName = clientName;
             _consulClient = consulClient;
-            _consulDiscoveryOptions = consulDiscoveryOptionsMonitor.Get(clientName);
+            _consulDiscoveryOptions = optionsAccessor.Value;
         }
 
         #region Implementation of IServerList<ConsulServer>

@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Ribbon.LoadBalancer.Impl.Ping;
 using Ribbon.LoadBalancer.Impl.Rule;
 using Ribbon.LoadBalancer.Impl.ServerList;
+using System;
 using System.Linq;
 
 namespace Ribbon.LoadBalancer
@@ -9,10 +11,12 @@ namespace Ribbon.LoadBalancer
     public class LoadBalancerOptionsSetup : IConfigureNamedOptions<LoadBalancerOptions>, IPostConfigureOptions<LoadBalancerOptions>
     {
         private readonly IOptionsMonitor<LoadBalancerConfig> _settingsMonitor;
+        private readonly IServiceProvider _services;
 
-        public LoadBalancerOptionsSetup(IOptionsMonitor<LoadBalancerConfig> settingsMonitor)
+        public LoadBalancerOptionsSetup(IOptionsMonitor<LoadBalancerConfig> settingsMonitor, IServiceProvider services)
         {
             _settingsMonitor = settingsMonitor;
+            _services = services;
         }
 
         #region Implementation of IConfigureOptions<in LoadBalancerOptions>
@@ -36,6 +40,10 @@ namespace Ribbon.LoadBalancer
             {
                 options.ServerList = new ConfigurationBasedServerList(settings);
             }
+
+            options.Rule = TryGetInstance<IRule>(settings.LoadBalancerRuleTypeName);
+            options.ServerList = TryGetInstance<IServerList<Server>>(settings.LoadBalancerServerListTypeName);
+            options.Ping = TryGetInstance<IPing>(settings.LoadBalancerPingTypeName);
 
             options.Settings = settings;
         }
@@ -65,5 +73,23 @@ namespace Ribbon.LoadBalancer
         }
 
         #endregion Implementation of IPostConfigureOptions<in LoadBalancerOptions>
+
+        private T TryGetInstance<T>(string typeName)
+        {
+            try
+            {
+                var type = string.IsNullOrEmpty(typeName) ? null : Type.GetType(typeName);
+                if (type == null)
+                {
+                    return default(T);
+                }
+                return (T)ActivatorUtilities.GetServiceOrCreateInstance(_services, type);
+            }
+            catch
+            {
+            }
+
+            return default(T);
+        }
     }
 }
