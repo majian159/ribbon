@@ -2,6 +2,7 @@
 using Ribbon.LoadBalancer.Impl.Ping;
 using Ribbon.LoadBalancer.Impl.Rule;
 using Ribbon.LoadBalancer.Impl.ServerList;
+using System.Linq;
 
 namespace Ribbon.LoadBalancer
 {
@@ -30,6 +31,11 @@ namespace Ribbon.LoadBalancer
         public void Configure(string name, LoadBalancerOptions options)
         {
             var settings = _settingsMonitor.Get(name);
+
+            if (settings.ListOfServers != null && settings.ListOfServers.Any())
+            {
+                options.ServerList = new ConfigurationBasedServerList(settings);
+            }
 
             options.Settings = settings;
         }

@@ -48,7 +48,7 @@ namespace ConsoleApp
             var services = serviceCollection.BuildServiceProvider();
 
             var rcom = services.GetService<IOptionsMonitor<RibbonHttpClientOptions>>();
-            var rco = rcom.Get("cs.wechat");
+            var rco = rcom.Get("client1");
 
             var client = new RibbonHttpClient(rco.HttpClient);
 

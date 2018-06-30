@@ -32,8 +32,13 @@ namespace Ribbon.Consul
         /// <inheritdoc/>
         public void Configure(string name, LoadBalancerOptions options)
         {
+            if (options.ServerList != null) return;
+
             options.ServerList = new ConsulServiceList(name, _services.GetService<ConsulClient>(), _services.GetService<IOptionsMonitor<ConsulDiscoveryOptions>>());
-            options.Ping = Ping;
+            if (options.Ping == null)
+            {
+                options.Ping = Ping;
+            }
         }
 
         #endregion Implementation of IConfigureNamedOptions<in LoadBalancerOptions>
