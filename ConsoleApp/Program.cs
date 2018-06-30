@@ -40,7 +40,7 @@ namespace ConsoleApp
             var rcom = services.GetService<IOptionsMonitor<RobbinHttpClientOptions>>();
             var rco = rcom.Get("client1");
 
-            var client = new RobbinHttpClient(rco);
+            var client = new RibbonHttpClient(rco);
 
             Thread.Sleep(1000);
 

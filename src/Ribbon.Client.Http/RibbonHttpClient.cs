@@ -10,17 +10,17 @@ using System.Threading.Tasks;
 
 namespace Ribbon.Client.Http
 {
-    public class RobbinHttpClient : LoadBalancerContext, IClient
+    public class RibbonHttpClient : LoadBalancerContext, IClient
     {
         private readonly HttpClient _httpClient;
 
         /// <inheritdoc/>
-        public RobbinHttpClient(HttpClient httpClient, ILoadBalancer loadBalancer, IRetryHandler retryHandler) : base(loadBalancer, retryHandler)
+        public RibbonHttpClient(HttpClient httpClient, ILoadBalancer loadBalancer, IRetryHandler retryHandler) : base(loadBalancer, retryHandler)
         {
             _httpClient = httpClient;
         }
 
-        public RobbinHttpClient(RobbinHttpClientOptions options) : this(options.HttpClient, options.LoadBalancer, options.RetryHandler)
+        public RibbonHttpClient(RobbinHttpClientOptions options) : this(options.HttpClient, options.LoadBalancer, options.RetryHandler)
         {
         }
 
@@ -37,39 +37,70 @@ namespace Ribbon.Client.Http
         private async Task<IHttpResponse> ExecuteAsync(HttpRequest request, ExecuteOptions executeOptions, CancellationToken cancellationToken)
         {
             var retryHandler = RetryHandler;
+            var responseMessage = await DoServerExecuteAsync(request, cancellationToken, retryHandler);
 
-            var maxRetriesOnNextServer = retryHandler.GetMaxRetriesOnNextServer();
-            var maxRetriesOnSameServer = retryHandler.GetMaxRetriesOnSameServer();
-
-            do
-            {
-                maxRetriesOnNextServer--;
-
-                var server = LoadBalancer.ChooseServer(null);
-
-                do
-                {
-                    maxRetriesOnSameServer--;
-
-                    try
-                    {
-                        await DoExecuteAsync(server, request, cancellationToken);
-                    }
-                    catch (Exception e)
-                    {
-                        if (retryHandler.IsCircuitTrippingException(e) || !retryHandler.IsRetriableException(e, true))
-                        {
-                            throw;
-                        }
-                        Console.WriteLine(e);
-                    }
-                } while (maxRetriesOnSameServer > 0);
-            } while (maxRetriesOnNextServer > 0);
-
-            return null;
+            return new HttpResponse(responseMessage);
         }
 
-        private async Task<IHttpResponse> DoExecuteAsync(Server server, HttpRequest request, CancellationToken cancellationToken)
+        private async Task<HttpResponseMessage> DoServerExecuteAsync(HttpRequest request,
+            CancellationToken cancellationToken, IRetryHandler retryHandler)
+        {
+            var maxRetriesCount = retryHandler.GetMaxRetriesOnNextServer();
+
+            Exception lastException;
+            Server server;
+            do
+            {
+                maxRetriesCount--;
+                server = LoadBalancer.ChooseServer(null);
+                try
+                {
+                    var responseMessage = await DoExecuteAsync(server, request, cancellationToken, retryHandler);
+                    return responseMessage;
+                }
+                catch (Exception e)
+                {
+                    if (retryHandler.IsCircuitTrippingException(e) || !retryHandler.IsRetriableException(e, true))
+                    {
+                        throw;
+                    }
+                    lastException = e;
+                    //todo log
+                }
+            } while (maxRetriesCount > 0);
+
+            throw new ClientException(ClientException.ErrorType.NUMBEROF_RETRIES_NEXTSERVER_EXCEEDED, $"Number of retries on next server exceeded max {retryHandler.GetMaxRetriesOnSameServer()} retries, while making a call for: {server}", lastException);
+        }
+
+        private async Task<HttpResponseMessage> DoExecuteAsync(Server server, HttpRequest request,
+            CancellationToken cancellationToken, IRetryHandler retryHandler)
+        {
+            var maxRetriesCount = retryHandler.GetMaxRetriesOnSameServer();
+
+            Exception lastException;
+            do
+            {
+                maxRetriesCount--;
+                try
+                {
+                    var responseMessage = await SendAsync(server, request, cancellationToken);
+                    return responseMessage;
+                }
+                catch (Exception e)
+                {
+                    if (retryHandler.IsCircuitTrippingException(e) || !retryHandler.IsRetriableException(e, true))
+                    {
+                        throw;
+                    }
+                    lastException = e;
+                    //todo log
+                }
+            } while (maxRetriesCount > 0);
+
+            throw new ClientException(ClientException.ErrorType.NUMBEROF_RETRIES_EXEEDED, $"Number of retries exceeded max {retryHandler.GetMaxRetriesOnSameServer()} retries, while making a call for: {server}", lastException);
+        }
+
+        private async Task<HttpResponseMessage> SendAsync(Server server, HttpRequest request, CancellationToken cancellationToken)
         {
             var uri = ReconstructUriWithServer(server, request.Uri);
             var requestMessage = new HttpRequestMessage(request.Method, uri)
@@ -86,9 +117,29 @@ namespace Ribbon.Client.Http
             }
 
             var responseMessage = await _httpClient.SendAsync(requestMessage, cancellationToken);
-
-            return new HttpResponse(responseMessage);
+            return responseMessage;
         }
+
+        /*        private async Task<IHttpResponse> DoExecuteAsync(Server server, HttpRequest request, CancellationToken cancellationToken)
+                {
+                    var uri = ReconstructUriWithServer(server, request.Uri);
+                    var requestMessage = new HttpRequestMessage(request.Method, uri)
+                    {
+                        Content = request.Content
+                    };
+                    if (request.HttpHeaders != null)
+                    {
+                        foreach (var header in request.HttpHeaders)
+                        {
+                            requestMessage.Headers.Remove(header.Key);
+                            requestMessage.Headers.Add(header.Key, header.Value);
+                        }
+                    }
+
+                    var responseMessage = await _httpClient.SendAsync(requestMessage, cancellationToken);
+
+                    return new HttpResponse(responseMessage);
+                }*/
 
         private class HttpResponse : IHttpResponse
         {
