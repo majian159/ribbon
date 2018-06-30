@@ -20,6 +20,10 @@ namespace Ribbon.Client.Http
             _httpClient = httpClient;
         }
 
+        public RobbinHttpClient(RobbinHttpClientOptions options) : this(options.HttpClient, options.LoadBalancer, options.RetryHandler)
+        {
+        }
+
         #region Implementation of IClient
 
         /// <inheritdoc/>

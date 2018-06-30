@@ -11,16 +11,21 @@ namespace Ribbon.LoadBalancer.Impl
     {
         private readonly IRule _rule;
         private readonly IPing _ping;
-        private readonly LoadBalancerSettings _settings;
+        private readonly ILoadBalancerSettings _settings;
         private readonly ConcurrentBag<Server> _servers = new ConcurrentBag<Server>();
         private readonly Timer _pingTimer;
         protected TimeSpan PingInterval { get; }
         public IServerList<Server> ServerList { get; set; }
 
         // protected int MaxTotalPingTime { get; } = 5;
-
-        public DefaultLoadBalancer(IRule rule, IPing ping, IServerList<Server> serverList, LoadBalancerSettings settings)
+        public DefaultLoadBalancer(LoadBalancerOptions options)
+            : this(options.Rule, options.Ping, options.ServerList, options.Settings)
         {
+        }
+
+        internal DefaultLoadBalancer(IRule rule, IPing ping, IServerList<Server> serverList, ILoadBalancerSettings settings)
+        {
+            rule.LoadBalancer = this;
             _rule = rule;
             _ping = ping;
             _settings = settings;

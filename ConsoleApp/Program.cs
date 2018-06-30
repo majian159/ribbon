@@ -1,10 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Ribbon.Client;
 using Ribbon.Client.Http;
+using Ribbon.Client.Options;
 using Ribbon.LoadBalancer;
 using System;
-using System.Net.Http;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace ConsoleApp
@@ -13,22 +15,32 @@ namespace ConsoleApp
     {
         private static void Main(string[] args)
         {
-            var services = new ServiceCollection()
-                .AddOptions()
-                .Configure<LoadBalancerSettings>("client1", s =>
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    s.ListOfServers = new[] { "http://www.baidu.com" };
+                    {"client1:ribbon:MaxAutoRetries","2" },
+                    {"client1:ribbon:MaxAutoRetriesNextServer","3" },
+                    {"client1:ribbon:OkToRetryOnAllOperations","true" },
+                    {"client1:ribbon:ListOfServers:0","http://www.baidu.com" },
+                    {"client1:ribbon:ListOfServers:1","https://www.baidu.com" }
                 })
+                .Build();
+
+            var serviceCollection = new ServiceCollection()
+                .AddOptions()
+                .AddSingleton<IConfiguration>(configuration)
+                .ConfigureOptions<RibbonOptionsSetup<RetryHandlerOptions>>()
+                .ConfigureOptions<RibbonOptionsSetup<LoadBalancerSettings>>()
                 .ConfigureOptions<LoadBalancerClientOptionsSetup>()
                 .ConfigureOptions<LoadBalancerOptionsSetup>()
-                .Configure<LoadBalancerClientOptions>("client1", s => { })
-                .Configure<LoadBalancerClientOptions>("client1", s => { })
-                .BuildServiceProvider();
+                .ConfigureOptions<RobbinHttpClientOptionsSetup>();
 
-            var com = services.GetService<IOptionsMonitor<LoadBalancerClientOptions>>();
-            var co = com.Get("client1");
+            var services = serviceCollection.BuildServiceProvider();
 
-            var client = new RobbinHttpClient(new HttpClient(), co.LoadBalancer, co.RetryHandler);
+            var rcom = services.GetService<IOptionsMonitor<RobbinHttpClientOptions>>();
+            var rco = rcom.Get("client1");
+
+            var client = new RobbinHttpClient(rco);
 
             Thread.Sleep(1000);
 

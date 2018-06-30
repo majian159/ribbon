@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Ribbon.Client\Ribbon.Client.csproj" />
     <ProjectReference Include="..\Ribbon.Core\Ribbon.Core.csproj" />
     <ProjectReference Include="..\Ribbon.Loadbalancer\Ribbon.LoadBalancer.csproj" />
   </ItemGroup>

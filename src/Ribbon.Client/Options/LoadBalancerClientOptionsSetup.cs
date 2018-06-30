@@ -2,20 +2,17 @@
 using Ribbon.Client.Impl;
 using Ribbon.LoadBalancer;
 using Ribbon.LoadBalancer.Impl;
-using System;
 
 namespace Ribbon.Client
 {
     public class LoadBalancerClientOptionsSetup : IConfigureNamedOptions<LoadBalancerClientOptions>
     {
         private readonly IOptionsMonitor<LoadBalancerOptions> _loadBalancerOptionsMonitor;
-        private readonly IOptionsMonitor<LoadBalancerSettings> _loadBalancerSettingsMonitor;
         private readonly IOptionsMonitor<RetryHandlerOptions> _retryHandlerOptionsMonitor;
 
-        public LoadBalancerClientOptionsSetup(IOptionsMonitor<LoadBalancerOptions> loadBalancerOptionsMonitor, IOptionsMonitor<LoadBalancerSettings> loadBalancerSettingsMonitor, IOptionsMonitor<RetryHandlerOptions> retryHandlerOptionsMonitor)
+        public LoadBalancerClientOptionsSetup(IOptionsMonitor<LoadBalancerOptions> loadBalancerOptionsMonitor, IOptionsMonitor<RetryHandlerOptions> retryHandlerOptionsMonitor)
         {
             _loadBalancerOptionsMonitor = loadBalancerOptionsMonitor;
-            _loadBalancerSettingsMonitor = loadBalancerSettingsMonitor;
             _retryHandlerOptionsMonitor = retryHandlerOptionsMonitor;
         }
 
@@ -24,7 +21,7 @@ namespace Ribbon.Client
         /// <inheritdoc/>
         public void Configure(LoadBalancerClientOptions options)
         {
-            throw new NotImplementedException();
+            Configure(Microsoft.Extensions.Options.Options.DefaultName, options);
         }
 
         #endregion Implementation of IConfigureOptions<in LoadBalancerClientOptions>
@@ -35,12 +32,10 @@ namespace Ribbon.Client
         public void Configure(string name, LoadBalancerClientOptions options)
         {
             var loadBalancerOptions = _loadBalancerOptionsMonitor.Get(name);
-            var loadBalancerSettings = _loadBalancerSettingsMonitor.Get(name);
 
-            var loadBalancer = new DefaultLoadBalancer(loadBalancerOptions.Rule, loadBalancerOptions.Ping, loadBalancerOptions.ServerList, loadBalancerSettings);
+            var loadBalancer = new DefaultLoadBalancer(loadBalancerOptions);
 
             options.LoadBalancer = loadBalancer;
-            loadBalancerOptions.Rule.LoadBalancer = loadBalancer;
 
             var retryHandlerOptions = _retryHandlerOptionsMonitor.Get(name);
             options.RetryHandler = new DefaultLoadBalancerRetryHandler(retryHandlerOptions);

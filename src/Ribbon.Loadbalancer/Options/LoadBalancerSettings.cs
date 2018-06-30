@@ -2,7 +2,12 @@
 
 namespace Ribbon.LoadBalancer
 {
-    public class LoadBalancerSettings
+    public interface ILoadBalancerSettings
+    {
+        TimeSpan LoadBalancerPingInterval { get; }
+    }
+
+    public class LoadBalancerSettings : ILoadBalancerSettings
     {
         public LoadBalancerSettings()
         {
@@ -13,7 +18,13 @@ namespace Ribbon.LoadBalancer
         public string PingName { get; set; }
         public string ServerListName { get; set; }
 
-        public TimeSpan LoadBalancerPingInterval { get; set; }
         public string[] ListOfServers { get; set; }
+
+        #region Implementation of ILoadBalancerSettings
+
+        /// <inheritdoc/>
+        public TimeSpan LoadBalancerPingInterval { get; }
+
+        #endregion Implementation of ILoadBalancerSettings
     }
 }

@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.Options;
-using Ribbon.LoadBalancer;
 using Ribbon.LoadBalancer.Impl.Ping;
 using Ribbon.LoadBalancer.Impl.Rule;
 using Ribbon.LoadBalancer.Impl.ServerList;
 
-namespace Ribbon.Client
+namespace Ribbon.LoadBalancer
 {
     public class LoadBalancerOptionsSetup : IConfigureNamedOptions<LoadBalancerOptions>
     {
@@ -59,6 +58,7 @@ namespace Ribbon.Client
             options.Ping = ping;
             options.Rule = rule;
             options.ServerList = serverList;
+            options.Settings = settings;
         }
 
         #endregion Implementation of IConfigureNamedOptions<in LoadBalancerOptions>
