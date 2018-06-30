@@ -29,8 +29,8 @@ namespace ConsoleApp
             var serviceCollection = new ServiceCollection()
                 .AddOptions()
                 .AddSingleton<IConfiguration>(configuration)
-                .ConfigureOptions<RibbonOptionsSetup<RetryHandlerOptions>>()
-                .ConfigureOptions<RibbonOptionsSetup<LoadBalancerSettings>>()
+                .ConfigureOptions<RibbonOptionsSetup<RetryHandlerConfig>>()
+                .ConfigureOptions<RibbonOptionsSetup<LoadBalancerConfig>>()
                 .ConfigureOptions<LoadBalancerClientOptionsSetup>()
                 .ConfigureOptions<LoadBalancerOptionsSetup>()
                 .ConfigureOptions<RobbinHttpClientOptionsSetup>();

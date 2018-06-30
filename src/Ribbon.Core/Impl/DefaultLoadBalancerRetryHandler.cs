@@ -35,7 +35,7 @@ namespace Ribbon.Client.Impl
             RetryEnabled = retryEnabled;
         }
 
-        public DefaultLoadBalancerRetryHandler(RetryHandlerOptions options)
+        public DefaultLoadBalancerRetryHandler(RetryHandlerConfig options)
         {
             RetrySameServer = options.MaxAutoRetries;
             RetryNextServer = options.MaxAutoRetriesNextServer;

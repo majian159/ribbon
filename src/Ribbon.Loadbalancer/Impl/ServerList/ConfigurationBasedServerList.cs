@@ -6,9 +6,9 @@ namespace Ribbon.LoadBalancer.Impl.ServerList
 {
     public class ConfigurationBasedServerList : IServerList<Server>
     {
-        private readonly LoadBalancerSettings _settings;
+        private readonly LoadBalancerConfig _settings;
 
-        public ConfigurationBasedServerList(LoadBalancerSettings settings)
+        public ConfigurationBasedServerList(LoadBalancerConfig settings)
         {
             _settings = settings;
         }

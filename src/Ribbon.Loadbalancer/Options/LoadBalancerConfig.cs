@@ -7,9 +7,9 @@ namespace Ribbon.LoadBalancer
         TimeSpan LoadBalancerPingInterval { get; }
     }
 
-    public class LoadBalancerSettings : ILoadBalancerSettings
+    public class LoadBalancerConfig : ILoadBalancerSettings
     {
-        public LoadBalancerSettings()
+        public LoadBalancerConfig()
         {
             LoadBalancerPingInterval = TimeSpan.FromSeconds(30);
         }

@@ -34,17 +34,24 @@ namespace Ribbon.LoadBalancer.Impl.Rule
             while (count++ < 10)
             {
                 var reachableServers = lb.GetReachableServers();
-                var allServers = lb.GetAllServers();
-                var upCount = reachableServers.Count;
-                var serverCount = allServers.Count;
+                var serverCount = reachableServers.Count;
 
-                if (upCount == 0 || serverCount == 0)
+                if (serverCount == 0)
                 {
                     return null;
                 }
 
-                var nextServerIndex = IncrementAndGetModulo(serverCount);
-                var server = allServers[nextServerIndex];
+                Server server;
+
+                if (serverCount == 1)
+                {
+                    server = reachableServers[0];
+                }
+                else
+                {
+                    var nextServerIndex = IncrementAndGetModulo(serverCount);
+                    server = reachableServers[nextServerIndex];
+                }
 
                 if (server == null)
                 {

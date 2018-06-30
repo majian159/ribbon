@@ -7,9 +7,9 @@ namespace Ribbon.LoadBalancer
 {
     public class LoadBalancerOptionsSetup : IConfigureNamedOptions<LoadBalancerOptions>
     {
-        private readonly IOptionsMonitor<LoadBalancerSettings> _settingsMonitor;
+        private readonly IOptionsMonitor<LoadBalancerConfig> _settingsMonitor;
 
-        public LoadBalancerOptionsSetup(IOptionsMonitor<LoadBalancerSettings> settingsMonitor)
+        public LoadBalancerOptionsSetup(IOptionsMonitor<LoadBalancerConfig> settingsMonitor)
         {
             _settingsMonitor = settingsMonitor;
         }

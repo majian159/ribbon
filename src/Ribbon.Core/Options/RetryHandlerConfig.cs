@@ -1,6 +1,6 @@
 ﻿namespace Ribbon.Client
 {
-    public class RetryHandlerOptions
+    public class RetryHandlerConfig
     {
         public uint MaxAutoRetries { get; set; } = 0;
         public uint MaxAutoRetriesNextServer { get; set; } = 1;

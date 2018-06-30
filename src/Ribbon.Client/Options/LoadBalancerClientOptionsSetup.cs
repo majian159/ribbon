@@ -8,9 +8,9 @@ namespace Ribbon.Client
     public class LoadBalancerClientOptionsSetup : IConfigureNamedOptions<LoadBalancerClientOptions>
     {
         private readonly IOptionsMonitor<LoadBalancerOptions> _loadBalancerOptionsMonitor;
-        private readonly IOptionsMonitor<RetryHandlerOptions> _retryHandlerOptionsMonitor;
+        private readonly IOptionsMonitor<RetryHandlerConfig> _retryHandlerOptionsMonitor;
 
-        public LoadBalancerClientOptionsSetup(IOptionsMonitor<LoadBalancerOptions> loadBalancerOptionsMonitor, IOptionsMonitor<RetryHandlerOptions> retryHandlerOptionsMonitor)
+        public LoadBalancerClientOptionsSetup(IOptionsMonitor<LoadBalancerOptions> loadBalancerOptionsMonitor, IOptionsMonitor<RetryHandlerConfig> retryHandlerOptionsMonitor)
         {
             _loadBalancerOptionsMonitor = loadBalancerOptionsMonitor;
             _retryHandlerOptionsMonitor = retryHandlerOptionsMonitor;

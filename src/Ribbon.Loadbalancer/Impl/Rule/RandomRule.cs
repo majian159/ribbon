@@ -26,16 +26,24 @@ namespace Ribbon.LoadBalancer.Impl.Rule
             while (true)
             {
                 var reachableServers = lb.GetReachableServers();
-                var allServers = lb.GetAllServers();
-                var serverCount = allServers.Count;
+                var serverCount = reachableServers.Count;
 
                 if (serverCount == 0)
                 {
                     return null;
                 }
 
-                var index = ChooseRandomInt(serverCount);
-                var server = reachableServers.ElementAtOrDefault(index);
+                Server server;
+                if (serverCount == 1)
+                {
+                    server = reachableServers[0];
+                }
+                else
+                {
+                    var index = ChooseRandomInt(serverCount);
+                    server = reachableServers.ElementAtOrDefault(index);
+                }
+
                 if (server == null)
                 {
                     Thread.Yield();
