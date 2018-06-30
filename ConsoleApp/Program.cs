@@ -1,7 +1,10 @@
-﻿using Ribbon.Client;
-using Ribbon.Client.Config;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Ribbon.Client;
 using Ribbon.Client.Http;
+using Ribbon.LoadBalancer;
 using System;
+using System.Net.Http;
 using System.Threading;
 
 namespace ConsoleApp
@@ -10,27 +13,36 @@ namespace ConsoleApp
     {
         private static void Main(string[] args)
         {
-            var clientFactory = new DefaultClientFactory();
+            var services = new ServiceCollection()
+                .AddOptions()
+                .Configure<LoadBalancerSettings>("client1", s =>
+                {
+                    s.ListOfServers = new[] { "http://www.baidu.com" };
+                })
+                .ConfigureOptions<LoadBalancerClientOptionsSetup>()
+                .ConfigureOptions<LoadBalancerOptionsSetup>()
+                .Configure<LoadBalancerClientOptions>("client1", s => { })
+                .Configure<LoadBalancerClientOptions>("client1", s => { })
+                .BuildServiceProvider();
 
-            var clientConfig = new DefaultClientConfig();
-            clientConfig.Properties[CommonClientConfigKey.ListOfServers] =
-                "http://www.baidu.com,https://www.baidu.com";
+            var com = services.GetService<IOptionsMonitor<LoadBalancerClientOptions>>();
+            var co = com.Get("client1");
 
-            // clientFactory.RegisterNamedLoadBalancerFromclientConfig("test", clientConfig);
-
-            var client = clientFactory.CreateNamedClient("test", clientConfig);
+            var client = new RobbinHttpClient(new HttpClient(), co.LoadBalancer, co.RetryHandler);
 
             Thread.Sleep(1000);
 
             while (true)
             {
-                var t = client.ExecuteAsync<HttpRequest, IHttpResponse>(new HttpRequest(new Uri("http://t")), clientConfig).GetAwaiter()
+                var t = client.ExecuteAsync<HttpRequest, IHttpResponse>(new HttpRequest(new Uri("http://t")), new ExecuteOptions()).GetAwaiter()
                     .GetResult();
                 Console.ReadLine();
                 // robbinHttpClient.
 
                 // Console.WriteLine(server.Id); Console.ReadLine();
             }
+
+            return;
         }
     }
 }

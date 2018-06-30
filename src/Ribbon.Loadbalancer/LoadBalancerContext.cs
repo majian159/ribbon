@@ -1,5 +1,4 @@
 ﻿using Ribbon.Client;
-using Ribbon.Client.Config;
 using Ribbon.Client.Impl;
 using System;
 using System.Text;
@@ -12,15 +11,11 @@ namespace Ribbon.LoadBalancer
         public ILoadBalancer LoadBalancer { get; set; }
         public IRetryHandler RetryHandler { get; set; }
 
-        public LoadBalancerContext(ILoadBalancer loadBalancer) : this(loadBalancer, null, null)
+        public LoadBalancerContext(ILoadBalancer loadBalancer) : this(loadBalancer, null)
         {
         }
 
-        public LoadBalancerContext(ILoadBalancer loadBalancer, IClientConfig clientConfig) : this(loadBalancer, clientConfig, clientConfig == null ? null : new DefaultLoadBalancerRetryHandler(clientConfig))
-        {
-        }
-
-        public LoadBalancerContext(ILoadBalancer loadBalancer, IClientConfig clientConfig, IRetryHandler retryHandler)
+        public LoadBalancerContext(ILoadBalancer loadBalancer, IRetryHandler retryHandler)
         {
             LoadBalancer = loadBalancer;
             RetryHandler = retryHandler ?? new DefaultLoadBalancerRetryHandler();

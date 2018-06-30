@@ -8,8 +8,8 @@ namespace Ribbon.Client
 
         bool IsCircuitTrippingException(Exception exception);
 
-        int GetMaxRetriesOnSameServer();
+        uint GetMaxRetriesOnSameServer();
 
-        int GetMaxRetriesOnNextServer();
+        uint GetMaxRetriesOnNextServer();
     }
 }

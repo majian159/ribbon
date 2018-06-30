@@ -1,4 +1,4 @@
-﻿using Ribbon.Client.Config;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,17 +11,19 @@ namespace Ribbon.LoadBalancer.Impl
     {
         private readonly IRule _rule;
         private readonly IPing _ping;
+        private readonly LoadBalancerSettings _settings;
         private readonly ConcurrentBag<Server> _servers = new ConcurrentBag<Server>();
         private readonly Timer _pingTimer;
-        protected int PingIntervalSeconds { get; }
+        protected TimeSpan PingInterval { get; }
         public IServerList<Server> ServerList { get; set; }
 
         // protected int MaxTotalPingTime { get; } = 5;
 
-        public DefaultLoadBalancer(IRule rule, IPing ping, IServerList<Server> serverList, IClientConfig clientConfig)
+        public DefaultLoadBalancer(IRule rule, IPing ping, IServerList<Server> serverList, LoadBalancerSettings settings)
         {
             _rule = rule;
             _ping = ping;
+            _settings = settings;
             ServerList = serverList;
 
             var updatedListOfServers = serverList?.GetUpdatedListOfServersAsync().GetAwaiter().GetResult();
@@ -43,8 +45,8 @@ namespace Ribbon.LoadBalancer.Impl
                     {
                         server.IsAlive = await ping.IsAliveAsync(server);
                     });
-                }, null, 0, PingIntervalSeconds * 1000);
-            PingIntervalSeconds = clientConfig.Get(CommonClientConfigKey.LoadBalancerPingInterval, 30);
+                }, null, TimeSpan.Zero, PingInterval);
+            PingInterval = _settings.LoadBalancerPingInterval;
         }
 
         #region Implementation of ILoadBalancer

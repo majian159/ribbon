@@ -1,5 +1,4 @@
-﻿using Ribbon.Client.Config;
-using Ribbon.LoadBalancer;
+﻿using Ribbon.LoadBalancer;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,15 +15,22 @@ namespace Ribbon.Client.Http
         private readonly HttpClient _httpClient;
 
         /// <inheritdoc/>
-        public RobbinHttpClient(HttpClient httpClient, ILoadBalancer loadBalancer, IClientConfig clientConfig) : base(loadBalancer, clientConfig)
+        public RobbinHttpClient(HttpClient httpClient, ILoadBalancer loadBalancer, IRetryHandler retryHandler) : base(loadBalancer, retryHandler)
         {
             _httpClient = httpClient;
         }
 
-        #region Implementation of IClient<in HttpRequest,IHttpResponse>
+        #region Implementation of IClient
 
         /// <inheritdoc/>
-        public async Task<IHttpResponse> ExecuteAsync(HttpRequest request, IClientConfig clientConfig, CancellationToken cancellationToken)
+        public async Task<object> ExecuteAsync(object request, ExecuteOptions settings, CancellationToken cancellationToken)
+        {
+            return await ExecuteAsync(request as HttpRequest, settings, cancellationToken);
+        }
+
+        #endregion Implementation of IClient
+
+        private async Task<IHttpResponse> ExecuteAsync(HttpRequest request, ExecuteOptions executeOptions, CancellationToken cancellationToken)
         {
             var retryHandler = RetryHandler;
 
@@ -153,17 +159,5 @@ namespace Ribbon.Client.Http
 
             #endregion Implementation of IHttpResponse
         }
-
-        #endregion Implementation of IClient<in HttpRequest,IHttpResponse>
-
-        #region Implementation of IClient
-
-        /// <inheritdoc />
-        public async Task<object> ExecuteAsync(object request, IClientConfig clientConfig, CancellationToken cancellationToken)
-        {
-            return await ExecuteAsync(request as HttpRequest, clientConfig, cancellationToken);
-        }
-
-        #endregion
     }
 }

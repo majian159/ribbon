@@ -1,5 +1,4 @@
-﻿using Ribbon.Client.Config;
-using Ribbon.Client.Util;
+﻿using Ribbon.Client.Util;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -22,25 +21,25 @@ namespace Ribbon.Client.Impl
         {
         }
 
-        protected int RetrySameServer { get; set; }
+        protected uint RetrySameServer { get; set; }
 
-        protected int RetryNextServer { get; set; }
+        protected uint RetryNextServer { get; set; }
 
         protected bool RetryEnabled { get; set; }
 
         /// <inheritdoc/>
-        public DefaultLoadBalancerRetryHandler(int retrySameServer, int retryNextServer, bool retryEnabled)
+        public DefaultLoadBalancerRetryHandler(uint retrySameServer, uint retryNextServer, bool retryEnabled)
         {
             RetrySameServer = retrySameServer;
             RetryNextServer = retryNextServer;
             RetryEnabled = retryEnabled;
         }
 
-        public DefaultLoadBalancerRetryHandler(IClientConfig clientConfig)
+        public DefaultLoadBalancerRetryHandler(RetryHandlerOptions options)
         {
-            RetrySameServer = clientConfig.Get(CommonClientConfigKey.MaxAutoRetries, DefaultClientConfigImpl.DEFAULT_MAX_AUTO_RETRIES);
-            RetryNextServer = clientConfig.Get(CommonClientConfigKey.MaxAutoRetriesNextServer, DefaultClientConfigImpl.DEFAULT_MAX_AUTO_RETRIES_NEXT_SERVER);
-            RetryEnabled = clientConfig.Get(CommonClientConfigKey.OkToRetryOnAllOperations, DefaultClientConfigImpl.DEFAULT_OK_TO_RETRY_ON_ALL_OPERATIONS);
+            RetrySameServer = options.MaxAutoRetries;
+            RetryNextServer = options.MaxAutoRetriesNextServer;
+            RetryEnabled = options.OkToRetryOnAllOperations;
         }
 
         #region Implementation of IRetryHandler
@@ -58,13 +57,13 @@ namespace Ribbon.Client.Impl
         }
 
         /// <inheritdoc/>
-        public int GetMaxRetriesOnSameServer()
+        public uint GetMaxRetriesOnSameServer()
         {
             return RetrySameServer;
         }
 
         /// <inheritdoc/>
-        public int GetMaxRetriesOnNextServer()
+        public uint GetMaxRetriesOnNextServer()
         {
             return RetryNextServer;
         }
