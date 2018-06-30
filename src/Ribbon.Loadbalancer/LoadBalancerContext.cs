@@ -21,7 +21,7 @@ namespace Ribbon.LoadBalancer
             RetryHandler = retryHandler ?? new DefaultLoadBalancerRetryHandler();
         }
 
-        public Uri ReconstructUriWithServer(Server server, Uri originalUri)
+        public static Uri ReconstructUriWithServer(Server server, Uri originalUri)
         {
             var host = server.Host;
             var port = server.Port;

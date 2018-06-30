@@ -6,18 +6,16 @@ namespace Ribbon.Client
     {
         public enum ErrorType
         {
-            GENERAL,
-            CONFIGURATION,
-            NUMBEROF_RETRIES_EXEEDED,
-            NUMBEROF_RETRIES_NEXTSERVER_EXCEEDED,
-            SOCKET_TIMEOUT_EXCEPTION,
-            READ_TIMEOUT_EXCEPTION,
-            UNKNOWN_HOST_EXCEPTION,
-            CONNECT_EXCEPTION,
-            CLIENT_THROTTLED,
-            SERVER_THROTTLED,
-            NO_ROUTE_TO_HOST_EXCEPTION,
-            CACHE_MISSING
+            General,
+            Configuration,
+            NumberofRetriesExceeded,
+            NumberofRetriesNextserverExceeded,
+            TimeoutException,
+            UnknownHostException,
+            ConnectException,
+            ClientThrottled,
+            ServerThrottled,
+            NoRouteToHostException
         }
 
         public ClientException(string message) : this(0, message, null)
@@ -45,7 +43,7 @@ namespace Ribbon.Client
         {
         }
 
-        public ClientException(ErrorType type, string message, Exception innerException) : base(message == null && type != ErrorType.GENERAL ? ", code=" + type + "->" + type : message, innerException)
+        public ClientException(ErrorType type, string message, Exception innerException) : base(message == null && type != ErrorType.General ? ", code=" + type + "->" + type : message, innerException)
         {
             ErrorCode = (int)type;
             Type = type;
