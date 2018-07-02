@@ -12,13 +12,13 @@ namespace Ribbon.Client.Http
 {
     public class RibbonHttpClient : IClient
     {
-        private readonly HttpClient _httpClient;
-        private RibbonHttpClientOptions _options;
+        public HttpClient HttpClient { get; }
+        private readonly RibbonHttpClientOptions _options;
 
         public RibbonHttpClient(string name, IOptionsMonitor<RibbonHttpClientOptions> optionsMonitor)
         {
             _options = optionsMonitor.Get(name);
-            _httpClient = _options.HttpClient;
+            HttpClient = _options.HttpClient;
         }
 
         #region Implementation of IClient
@@ -36,7 +36,7 @@ namespace Ribbon.Client.Http
             {
                 var requestMessage = CreateHttpRequestMessage(httpRequest);
 
-                var responseMessage = await _httpClient.SendAsync(requestMessage, cancellationToken);
+                var responseMessage = await HttpClient.SendAsync(requestMessage, cancellationToken);
                 return new HttpResponse(responseMessage);
             }
 

@@ -10,7 +10,6 @@ namespace Ribbon.Client.Http.Options
     {
         private readonly IOptionsMonitor<LoadBalancerClientOptions> _loadBalancerClientOptionsMonitor;
 
-
         private readonly IConfiguration _configuration;
 
         public HttpClientFactoryOptionsSetup(IServiceProvider services, IOptionsMonitor<LoadBalancerClientOptions> loadBalancerClientOptionsMonitor)
@@ -41,6 +40,7 @@ namespace Ribbon.Client.Http.Options
             options.HttpClientActions.Add(s =>
             {
                 s.Timeout = config.Timeout;
+                s.BaseAddress = new Uri("http://" + name);
             });
 
             options.HttpMessageHandlerBuilderActions.Add(s =>

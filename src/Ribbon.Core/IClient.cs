@@ -26,5 +26,12 @@ namespace Ribbon.Client
         {
             return client.ExecuteAsync<TRequest, TResponse>(request, settings, CancellationToken.None);
         }
+
+        public static async Task<TResponse> ExecuteAsync<TRequest, TResponse>(this IClient client, TRequest request)
+            where TRequest : ClientRequest
+            where TResponse : IResponse
+        {
+            return (TResponse)await client.ExecuteAsync(request, CancellationToken.None);
+        }
     }
 }

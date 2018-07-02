@@ -9,6 +9,7 @@ namespace Ribbon.Client.Http
         {
             builder
                 .Services
+                .AddHttpClient()
                 .ConfigureOptions<HttpClientFactoryOptionsSetup>()
                 .ConfigureOptions<RibbonHttpClientOptionsSetup>();
 

@@ -16,4 +16,8 @@
     <ProjectReference Include="..\Ribbon.Loadbalancer\Ribbon.LoadBalancer.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Extensions\" />
+  </ItemGroup>
+
 </Project>
