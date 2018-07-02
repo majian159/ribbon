@@ -10,17 +10,6 @@ namespace Ribbon.Client.Http.Options
     {
         private readonly IOptionsMonitor<LoadBalancerClientOptions> _loadBalancerClientOptionsMonitor;
 
-        internal class HttpClientFactoryConfig
-        {
-            public static readonly HttpClientFactoryConfig Default = new HttpClientFactoryConfig();
-
-            public HttpClientFactoryConfig()
-            {
-                Timeout = TimeSpan.FromSeconds(10);
-            }
-
-            public TimeSpan Timeout { get; set; }
-        }
 
         private readonly IConfiguration _configuration;
 

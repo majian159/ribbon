@@ -57,7 +57,7 @@ namespace Ribbon.LoadBalancer
         {
             if (options.Ping == null)
             {
-                options.Ping = new NoOpPing();
+                options.Ping = NoOpPing.Default;
             }
 
             if (options.Rule == null)
