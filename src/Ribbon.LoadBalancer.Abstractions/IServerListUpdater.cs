@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Ribbon.LoadBalancer.Abstractions
+namespace Ribbon.LoadBalancer
 {
     public interface IServerListUpdater
     {

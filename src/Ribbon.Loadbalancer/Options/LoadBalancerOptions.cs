@@ -1,6 +1,4 @@
-﻿using Ribbon.LoadBalancer.Abstractions;
-
-namespace Ribbon.LoadBalancer
+﻿namespace Ribbon.LoadBalancer
 {
     public class LoadBalancerOptions
     {

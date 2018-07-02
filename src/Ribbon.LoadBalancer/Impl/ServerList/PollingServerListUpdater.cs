@@ -1,5 +1,4 @@
-﻿using Ribbon.LoadBalancer.Abstractions;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,7 +7,7 @@ namespace Ribbon.LoadBalancer.Impl.ServerList
     public class PollingServerListUpdater : IServerListUpdater
     {
         private readonly LoadBalancerConfig _config;
-        private Timer _timer;
+        private readonly Timer _timer;
         private Func<Task> _updateAction;
 
         public PollingServerListUpdater(LoadBalancerConfig config)

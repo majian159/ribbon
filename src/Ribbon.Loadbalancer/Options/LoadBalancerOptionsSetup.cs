@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Ribbon.LoadBalancer.Abstractions;
 using Ribbon.LoadBalancer.Impl.Ping;
 using Ribbon.LoadBalancer.Impl.Rule;
 using Ribbon.LoadBalancer.Impl.ServerList;
