@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27703.2035
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ribbon.Core", "src\Ribbon.Core\Ribbon.Core.csproj", "{12408CB3-54A4-4ED9-854F-F58C7CAF58C7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ribbon.LoadBalancer", "src\Ribbon.Loadbalancer\Ribbon.LoadBalancer.csproj", "{7B556E48-1FEE-4C33-B6D1-45C35A25D946}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ribbon.LoadBalancer", "src\Ribbon.LoadBalancer\Ribbon.LoadBalancer.csproj", "{7B556E48-1FEE-4C33-B6D1-45C35A25D946}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ribbon.Client.Http", "src\Ribbon.Client.Http\Ribbon.Client.Http.csproj", "{19B2D199-868A-4967-9694-D55A616AED2F}"
 EndProject
@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp", "ConsoleApp\Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ribbon.Client", "src\Ribbon.Client\Ribbon.Client.csproj", "{EDF42387-D3AE-43DC-B16D-60ED54119B80}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ribbon.Consul", "src\Ribbon.Consul\Ribbon.Consul.csproj", "{0D2BB84F-A7CC-45C8-8DF0-E6281F96A3EE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ribbon.LoadBalancer.Consul", "src\Ribbon.LoadBalancer.Consul\Ribbon.LoadBalancer.Consul.csproj", "{0D2BB84F-A7CC-45C8-8DF0-E6281F96A3EE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Steeltoe.Discovery.ConsulBase", "..\steeltoe-extensions\src\discovery\Steeltoe.Discovery.ConsulBase\Steeltoe.Discovery.ConsulBase.csproj", "{7FCCF978-2DEE-4B1B-978C-D99ED66A4A3D}"
 EndProject
