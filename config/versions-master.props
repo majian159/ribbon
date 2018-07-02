@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup>
+    <RibbonVersion>$(RIBBON_VERSION)</SteeltoeVersion>
+    <RibbonVersionSuffix>$(RIBBON_DASH_VERSION_SUFFIX)</SteeltoeVersionSuffix>
+    <AspNetCoreVersion>2.1.0</AspNetCoreVersion>
+    <CoreFxVersion>4.5.0</CoreFxVersion>
+  </PropertyGroup>
+</Project>
