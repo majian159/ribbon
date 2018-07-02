@@ -67,15 +67,15 @@ namespace Ribbon.LoadBalancer
                 options.Rule = new RoundRobinRule();
             }
 
+            var settings = _settingsMonitor.Get(name);
+
             if (options.ServerList == null)
             {
-                var settings = _settingsMonitor.Get(name);
                 options.ServerList = new ConfigurationBasedServerList(settings);
             }
 
-            if (options.ServerListUpdater == null)
+            if (options.ServerListUpdater == null && !(options.ServerList is ConfigurationBasedServerList))
             {
-                var settings = _settingsMonitor.Get(name);
                 options.ServerListUpdater = new PollingServerListUpdater(settings);
             }
         }

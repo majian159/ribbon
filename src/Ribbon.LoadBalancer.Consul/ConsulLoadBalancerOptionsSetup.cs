@@ -34,7 +34,7 @@ namespace Ribbon.LoadBalancer.Consul
             var serverListTypeName = options.Settings.LoadBalancerServerListTypeName;
             var pingTypeName = options.Settings.LoadBalancerPingTypeName;
 
-            if (serverListTypeName == null || Type.GetType(serverListTypeName) != typeof(ConsulServerList))
+            if (!string.IsNullOrEmpty(serverListTypeName) && Type.GetType(serverListTypeName) != typeof(ConsulServerList))
             {
                 return;
             }
