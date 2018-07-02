@@ -22,8 +22,7 @@ namespace ConsoleApp
                     {"client1:ribbon:OkToRetryOnAllOperations","true" },
                     {"client1:ribbon:ListOfServers:0","https://www.baidu.com" },
                     {"client1:ribbon:ListOfServers:1","http://www.baidu.com" },
-                    {"client1:ribbon:Timeout","00:02:00" },
-                    {"cs.wechat:ribbon:LoadBalancerServerListTypeName",typeof(ConsulServerList).FullName }
+                    {"client1:ribbon:Timeout","00:02:00" }
                 })
                 .Build();
 

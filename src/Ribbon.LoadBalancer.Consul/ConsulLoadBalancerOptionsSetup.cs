@@ -31,6 +31,11 @@ namespace Ribbon.LoadBalancer.Consul
         /// <inheritdoc/>
         public void Configure(string name, LoadBalancerOptions options)
         {
+            if (options.ServerList != null)
+            {
+                return;
+            }
+
             var serverListTypeName = options.Settings.LoadBalancerServerListTypeName;
             var pingTypeName = options.Settings.LoadBalancerPingTypeName;
 

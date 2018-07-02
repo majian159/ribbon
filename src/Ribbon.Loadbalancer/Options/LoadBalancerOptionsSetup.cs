@@ -37,15 +37,20 @@ namespace Ribbon.LoadBalancer
         {
             var settings = _settingsMonitor.Get(name);
 
+            options.Rule = TryGetInstance<IRule>(settings.LoadBalancerRuleTypeName);
+
+            //ConfigurationBasedServerList
             if (settings.ListOfServers != null && settings.ListOfServers.Any())
             {
                 options.ServerList = new ConfigurationBasedServerList(settings);
             }
+            else
+            {
+                options.ServerList = TryGetInstance<IServerList<Server>>(settings.LoadBalancerServerListTypeName);
+                options.ServerListUpdater = TryGetInstance<IServerListUpdater>(settings.ServerListUpdaterTypeName);
+            }
 
-            options.Rule = TryGetInstance<IRule>(settings.LoadBalancerRuleTypeName);
-            options.ServerList = TryGetInstance<IServerList<Server>>(settings.LoadBalancerServerListTypeName);
             options.Ping = TryGetInstance<IPing>(settings.LoadBalancerPingTypeName);
-            options.ServerListUpdater = TryGetInstance<IServerListUpdater>(settings.ServerListUpdaterTypeName);
 
             options.Settings = settings;
         }
