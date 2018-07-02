@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using Steeltoe.Discovery.Consul.Discovery;
 using System;
 
-namespace Ribbon.LoadBalancer.Consul
+namespace Ribbon.LoadBalancer.ConsulDiscovery
 {
     public class ConsulLoadBalancerOptionsSetup : IConfigureNamedOptions<LoadBalancerOptions>
     {
@@ -21,7 +21,7 @@ namespace Ribbon.LoadBalancer.Consul
         /// <inheritdoc/>
         public void Configure(LoadBalancerOptions options)
         {
-            Configure(Options.DefaultName, options);
+            Configure(Microsoft.Extensions.Options.Options.DefaultName, options);
         }
 
         #endregion Implementation of IConfigureOptions<in LoadBalancerOptions>

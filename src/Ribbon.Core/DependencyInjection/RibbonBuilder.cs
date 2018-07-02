@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Ribbon.Client
+namespace Ribbon
 {
     public class RibbonBuilder : IRibbonBuilder
     {

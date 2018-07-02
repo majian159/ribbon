@@ -1,4 +1,4 @@
-﻿using Ribbon.LoadBalancer;
+﻿using Ribbon.LoadBalancer.Util;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,7 +32,7 @@ namespace Ribbon.Client.Http.Options
                 throw new ClientException(ClientException.ErrorType.General, "Invalid Server for :" + server);
             }
 
-            request.RequestUri = LoadBalancerContext.ReconstructUriWithServer(server, request.RequestUri);
+            request.RequestUri = LoadBalancerUtil.ReconstructUriWithServer(server, request.RequestUri);
 
             return base.SendAsync(request, cancellationToken);
         }

@@ -2,6 +2,7 @@
 using Ribbon.Client.Impl;
 using Ribbon.Client.Options;
 using Ribbon.LoadBalancer;
+using Ribbon.Options;
 using System;
 
 namespace Ribbon.Client

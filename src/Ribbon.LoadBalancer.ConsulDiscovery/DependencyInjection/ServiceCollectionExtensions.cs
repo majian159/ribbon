@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Ribbon.Client;
 
-namespace Ribbon.LoadBalancer.Consul
+namespace Ribbon.LoadBalancer.ConsulDiscovery
 {
     public static class ServiceCollectionExtensions
     {

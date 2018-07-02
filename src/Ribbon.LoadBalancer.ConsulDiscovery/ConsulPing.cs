@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Ribbon.LoadBalancer.Consul
+namespace Ribbon.LoadBalancer.ConsulDiscovery
 {
     public class ConsulPing : IPing
     {

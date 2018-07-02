@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System;
 
-namespace Ribbon.Client.Options
+namespace Ribbon.Options
 {
     public class RibbonOptionsSetup<TOptions> : IConfigureNamedOptions<TOptions> where TOptions : class
     {

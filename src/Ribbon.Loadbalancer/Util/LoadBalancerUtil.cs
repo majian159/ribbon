@@ -1,26 +1,10 @@
-﻿/*using Ribbon.Client;
-using Ribbon.Client.Impl;
-using System;
+﻿using System;
 using System.Text;
 
-namespace Ribbon.LoadBalancer
+namespace Ribbon.LoadBalancer.Util
 {
-    public class LoadBalancerContext
+    public static class LoadBalancerUtil
     {
-        public string ClientName { get; protected set; }
-        public ILoadBalancer LoadBalancer { get; set; }
-        public IRetryHandler RetryHandler { get; set; }
-
-        public LoadBalancerContext(ILoadBalancer loadBalancer) : this(loadBalancer, null)
-        {
-        }
-
-        public LoadBalancerContext(ILoadBalancer loadBalancer, IRetryHandler retryHandler)
-        {
-            LoadBalancer = loadBalancer;
-            RetryHandler = retryHandler ?? new DefaultLoadBalancerRetryHandler();
-        }
-
         public static Uri ReconstructUriWithServer(Server server, Uri originalUri)
         {
             var host = server.Host;
@@ -58,4 +42,4 @@ namespace Ribbon.LoadBalancer
             return new Uri(sb.ToString());
         }
     }
-}*/
+}

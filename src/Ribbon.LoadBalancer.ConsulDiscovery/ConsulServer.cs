@@ -2,7 +2,7 @@
 using Steeltoe.Discovery.Consul.Util;
 using System.Linq;
 
-namespace Ribbon.LoadBalancer.Consul
+namespace Ribbon.LoadBalancer.ConsulDiscovery
 {
     public class ConsulServer : Server
     {
