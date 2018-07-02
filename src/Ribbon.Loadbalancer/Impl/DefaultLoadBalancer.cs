@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ribbon.LoadBalancer.Abstractions;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,11 +8,10 @@ using System.Threading.Tasks;
 
 namespace Ribbon.LoadBalancer.Impl
 {
-    public class DefaultLoadBalancer : ILoadBalancer
+    public class DefaultLoadBalancer : ILoadBalancer, IDisposable
     {
         private readonly IRule _rule;
-        private readonly IPing _ping;
-        private readonly ILoadBalancerSettings _settings;
+        private readonly IServerListUpdater _serverListUpdater;
         private readonly ConcurrentBag<Server> _servers = new ConcurrentBag<Server>();
         private readonly Timer _pingTimer;
         protected TimeSpan PingInterval { get; }
@@ -19,30 +19,19 @@ namespace Ribbon.LoadBalancer.Impl
 
         // protected int MaxTotalPingTime { get; } = 5;
         public DefaultLoadBalancer(LoadBalancerOptions options)
-            : this(options.Rule, options.Ping, options.ServerList, options.Settings)
+            : this(options.Rule, options.Ping, options.ServerList, options.ServerListUpdater, options.Settings)
         {
         }
 
-        internal DefaultLoadBalancer(IRule rule, IPing ping, IServerList<Server> serverList, ILoadBalancerSettings settings)
+        internal DefaultLoadBalancer(IRule rule, IPing ping, IServerList<Server> serverList, IServerListUpdater serverListUpdater, ILoadBalancerSettings settings)
         {
             rule.LoadBalancer = this;
             _rule = rule;
-            _ping = ping;
-            _settings = settings;
+            _serverListUpdater = serverListUpdater;
             ServerList = serverList;
 
-            var updatedListOfServers = serverList?.GetUpdatedListOfServersAsync().GetAwaiter().GetResult();
-            while (_servers.TryPeek(out _))
-            {
-            }
-
-            if (updatedListOfServers != null)
-            {
-                foreach (var server in updatedListOfServers)
-                {
-                    _servers.Add(server);
-                }
-            }
+            UpdateListOfServersAsync().GetAwaiter().GetResult();
+            serverListUpdater?.Start(UpdateListOfServersAsync);
 
             _pingTimer = new Timer(s =>
                 {
@@ -51,7 +40,7 @@ namespace Ribbon.LoadBalancer.Impl
                         server.IsAlive = await ping.IsAliveAsync(server);
                     });
                 }, null, TimeSpan.Zero, PingInterval);
-            PingInterval = _settings.LoadBalancerPingInterval;
+            PingInterval = settings.LoadBalancerPingInterval;
         }
 
         #region Implementation of ILoadBalancer
@@ -99,5 +88,29 @@ namespace Ribbon.LoadBalancer.Impl
         }
 
         #endregion Implementation of ILoadBalancer
+
+        private async Task UpdateListOfServersAsync()
+        {
+            while (_servers.TryTake(out _))
+            {
+            }
+            var servers = await ServerList.GetUpdatedListOfServersAsync();
+            foreach (var server in servers)
+            {
+                server.IsAlive = true;
+                _servers.Add(server);
+            }
+        }
+
+        #region IDisposable
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            _pingTimer?.Dispose();
+            _serverListUpdater.Stop();
+        }
+
+        #endregion IDisposable
     }
 }

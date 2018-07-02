@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Ribbon.LoadBalancer.Abstractions;
 using Ribbon.LoadBalancer.Impl.Ping;
 using Ribbon.LoadBalancer.Impl.Rule;
 using Ribbon.LoadBalancer.Impl.ServerList;
@@ -44,6 +45,7 @@ namespace Ribbon.LoadBalancer
             options.Rule = TryGetInstance<IRule>(settings.LoadBalancerRuleTypeName);
             options.ServerList = TryGetInstance<IServerList<Server>>(settings.LoadBalancerServerListTypeName);
             options.Ping = TryGetInstance<IPing>(settings.LoadBalancerPingTypeName);
+            options.ServerListUpdater = TryGetInstance<IServerListUpdater>(settings.ServerListUpdaterTypeName);
 
             options.Settings = settings;
         }
@@ -69,6 +71,12 @@ namespace Ribbon.LoadBalancer
             {
                 var settings = _settingsMonitor.Get(name);
                 options.ServerList = new ConfigurationBasedServerList(settings);
+            }
+
+            if (options.ServerListUpdater == null)
+            {
+                var settings = _settingsMonitor.Get(name);
+                options.ServerListUpdater = new PollingServerListUpdater(settings);
             }
         }
 

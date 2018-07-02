@@ -7,6 +7,7 @@ namespace Ribbon.LoadBalancer
         string LoadBalancerRuleTypeName { get; }
         string LoadBalancerPingTypeName { get; }
         string LoadBalancerServerListTypeName { get; }
+        string ServerListUpdaterTypeName { get; }
         TimeSpan LoadBalancerPingInterval { get; }
     }
 
@@ -15,9 +16,11 @@ namespace Ribbon.LoadBalancer
         public LoadBalancerConfig()
         {
             LoadBalancerPingInterval = TimeSpan.FromSeconds(30);
+            ServerListRefreshInterval = TimeSpan.FromSeconds(30);
         }
 
         public string[] ListOfServers { get; set; }
+        public TimeSpan ServerListRefreshInterval { get; set; }
 
         #region Implementation of ILoadBalancerSettings
 
@@ -29,6 +32,9 @@ namespace Ribbon.LoadBalancer
 
         /// <inheritdoc/>
         public string LoadBalancerServerListTypeName { get; set; }
+
+        /// <inheritdoc/>
+        public string ServerListUpdaterTypeName { get; set; }
 
         /// <inheritdoc/>
         public TimeSpan LoadBalancerPingInterval { get; }
