@@ -1,13 +1,13 @@
 ﻿using Consul;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Ribbon.Client;
 using Ribbon.Client.Http;
 using Ribbon.Client.Http.Options;
+using Ribbon.Client.Impl;
 using Ribbon.Client.Options;
-using Ribbon.Consul;
 using Ribbon.LoadBalancer;
+using Ribbon.LoadBalancer.Consul;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -37,21 +37,23 @@ namespace ConsoleApp
                 .AddHttpClient()
                 .AddSingleton<IConfiguration>(configuration)
                 .ConfigureOptions<HttpClientFactoryOptionsSetup>()
+                .ConfigureOptions<RibbonOptionsSetup<LoadBalancerClientConfig>>()
                 .ConfigureOptions<RibbonOptionsSetup<RetryHandlerConfig>>()
                 .ConfigureOptions<RibbonOptionsSetup<LoadBalancerConfig>>()
                 .ConfigureOptions<LoadBalancerClientOptionsSetup>()
                 .ConfigureOptions<LoadBalancerOptionsSetup>()
                 .ConfigureOptions<RibbonHttpClientOptionsSetup>()
-                .ConfigureOptions<ConsulLoadBalancerOptionsSetup>();
+                .ConfigureOptions<ConsulLoadBalancerOptionsSetup>()
+                .AddSingleton<IClientFactory, DefaultClientFactory>();
 
             var services = serviceCollection.BuildServiceProvider();
 
-            var rcom = services.GetService<IOptionsMonitor<RibbonHttpClientOptions>>();
-            var rco = rcom.Get("cs.wechat");
-            var rco2 = rcom.Get("client1");
 
-            var client = new RibbonHttpClient(rco.HttpClient);
-            var client2 = new RibbonHttpClient(rco2.HttpClient);
+            var clientFactory = services.GetService<IClientFactory>();
+
+
+            var client2=clientFactory.CreateClient("client1");
+            var client = clientFactory.CreateClient("cs.wechat");
 
             Thread.Sleep(1000);
 

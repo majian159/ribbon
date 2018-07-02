@@ -1,12 +1,11 @@
 ﻿using Consul;
 using Microsoft.Extensions.Options;
-using Ribbon.LoadBalancer;
 using Steeltoe.Discovery.Consul.Discovery;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Ribbon.Consul
+namespace Ribbon.LoadBalancer.Consul
 {
     public class ConsulServerList : IServerList<Server>
     {

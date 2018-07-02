@@ -1,7 +1,6 @@
-﻿using Ribbon.LoadBalancer;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-namespace Ribbon.Consul
+namespace Ribbon.LoadBalancer.Consul
 {
     public class ConsulPing : IPing
     {

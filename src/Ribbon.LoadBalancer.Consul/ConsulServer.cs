@@ -1,9 +1,8 @@
 ﻿using Consul;
-using Ribbon.LoadBalancer;
 using Steeltoe.Discovery.Consul.Util;
 using System.Linq;
 
-namespace Ribbon.Consul
+namespace Ribbon.LoadBalancer.Consul
 {
     public class ConsulServer : Server
     {

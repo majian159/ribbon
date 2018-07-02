@@ -1,11 +1,10 @@
 ﻿using Consul;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Ribbon.LoadBalancer;
 using Steeltoe.Discovery.Consul.Discovery;
 using System;
 
-namespace Ribbon.Consul
+namespace Ribbon.LoadBalancer.Consul
 {
     public class ConsulLoadBalancerOptionsSetup : IConfigureNamedOptions<LoadBalancerOptions>
     {

@@ -5,13 +5,13 @@ namespace Ribbon.Client.Http
 {
     public class RibbonHttpClientOptionsSetup : IConfigureNamedOptions<RibbonHttpClientOptions>
     {
-        private readonly IOptionsMonitor<LoadBalancerClientOptions> _loadBalancerClientOptionsMonitor;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IOptionsMonitor<LoadBalancerClientOptions> _loadBalancerClientOptionsMonitor;
 
-        public RibbonHttpClientOptionsSetup(IOptionsMonitor<LoadBalancerClientOptions> loadBalancerClientOptionsMonitor, IHttpClientFactory httpClientFactory)
+        public RibbonHttpClientOptionsSetup(IHttpClientFactory httpClientFactory, IOptionsMonitor<LoadBalancerClientOptions> loadBalancerClientOptionsMonitor)
         {
-            _loadBalancerClientOptionsMonitor = loadBalancerClientOptionsMonitor;
             _httpClientFactory = httpClientFactory;
+            _loadBalancerClientOptionsMonitor = loadBalancerClientOptionsMonitor;
         }
 
         #region Implementation of IConfigureOptions<in RobbinHttpClientOptions>
@@ -29,11 +29,8 @@ namespace Ribbon.Client.Http
         /// <inheritdoc/>
         public void Configure(string name, RibbonHttpClientOptions options)
         {
-            var loadBalancerClientOptions = _loadBalancerClientOptionsMonitor.Get(name);
-
-            options.LoadBalancer = loadBalancerClientOptions.LoadBalancer;
             options.HttpClient = _httpClientFactory.CreateClient(name);
-            options.RetryHandler = loadBalancerClientOptions.RetryHandler;
+            options.LoadBalancerClientOptions = _loadBalancerClientOptionsMonitor.Get(name);
         }
 
         #endregion Implementation of IConfigureNamedOptions<in RobbinHttpClientOptions>

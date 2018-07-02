@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,13 +13,21 @@ namespace Ribbon.Client.Http
     public class RibbonHttpClient : IClient
     {
         private readonly HttpClient _httpClient;
+        private RibbonHttpClientOptions _options;
 
-        public RibbonHttpClient(HttpClient httpClient)
+        public RibbonHttpClient(string name, IOptionsMonitor<RibbonHttpClientOptions> optionsMonitor)
         {
-            _httpClient = httpClient;
+            _options = optionsMonitor.Get(name);
+            _httpClient = _options.HttpClient;
         }
 
         #region Implementation of IClient
+
+        /// <inheritdoc/>
+        public Task<object> ExecuteAsync(object request, CancellationToken cancellationToken)
+        {
+            return ExecuteAsync(request, _options.LoadBalancerClientOptions.DefaultExecuteOptions, cancellationToken);
+        }
 
         /// <inheritdoc/>
         public async Task<object> ExecuteAsync(object request, ExecuteOptions settings, CancellationToken cancellationToken)

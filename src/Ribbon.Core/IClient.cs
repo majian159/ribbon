@@ -5,6 +5,8 @@ namespace Ribbon.Client
 {
     public interface IClient
     {
+        Task<object> ExecuteAsync(object request, CancellationToken cancellationToken);
+
         Task<object> ExecuteAsync(object request, ExecuteOptions settings, CancellationToken cancellationToken);
     }
 
