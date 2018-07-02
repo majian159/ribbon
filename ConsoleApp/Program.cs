@@ -3,10 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ribbon.Client;
 using Ribbon.Client.Http;
-using Ribbon.Client.Http.Options;
-using Ribbon.Client.Impl;
-using Ribbon.Client.Options;
-using Ribbon.LoadBalancer;
 using Ribbon.LoadBalancer.Consul;
 using System;
 using System.Collections.Generic;
@@ -36,23 +32,13 @@ namespace ConsoleApp
                 .AddSingleton(new ConsulClient(s => s.Address = new Uri("http://192.168.100.150:8500")))
                 .AddHttpClient()
                 .AddSingleton<IConfiguration>(configuration)
-                .ConfigureOptions<HttpClientFactoryOptionsSetup>()
-                .ConfigureOptions<RibbonOptionsSetup<LoadBalancerClientConfig>>()
-                .ConfigureOptions<RibbonOptionsSetup<RetryHandlerConfig>>()
-                .ConfigureOptions<RibbonOptionsSetup<LoadBalancerConfig>>()
-                .ConfigureOptions<LoadBalancerClientOptionsSetup>()
-                .ConfigureOptions<LoadBalancerOptionsSetup>()
-                .ConfigureOptions<RibbonHttpClientOptionsSetup>()
-                .ConfigureOptions<ConsulLoadBalancerOptionsSetup>()
-                .AddSingleton<IClientFactory, DefaultClientFactory>();
+                .AddRibbonClient(b => b.AddHttpClient().AddConsulDiscovery());
 
             var services = serviceCollection.BuildServiceProvider();
 
-
             var clientFactory = services.GetService<IClientFactory>();
 
-
-            var client2=clientFactory.CreateClient("client1");
+            var client2 = clientFactory.CreateClient("client1");
             var client = clientFactory.CreateClient("cs.wechat");
 
             Thread.Sleep(1000);
