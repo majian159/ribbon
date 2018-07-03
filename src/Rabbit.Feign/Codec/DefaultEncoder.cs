@@ -21,7 +21,7 @@ namespace Rabbit.Feign.Codec
 
             var json = JsonConvert.SerializeObject(obj);
             request.Content = new StringContent(json);
-            // request.Content.Headers.ContentType.MediaType = "application/json";
+            request.Content.Headers.ContentType.MediaType = "application/json";
 
             return Task.CompletedTask;
         }

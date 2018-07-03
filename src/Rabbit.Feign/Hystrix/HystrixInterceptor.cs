@@ -147,14 +147,29 @@ namespace Rabbit.Feign.Hystrix
                 var realType = isTask ? returnType.IsGenericType ? returnType.GenericTypeArguments[0] : typeof(object) : returnType;
 
                 var fallbackInstance = ActivatorUtilities.GetServiceOrCreateInstance(_services, _hystrixType);
-                var argumentsExpressions = invocation.Arguments.Select(a => Expression.Constant(a)).ToArray();
+
+                var parameters = method.GetParameters();
+                var argumentsExpressions = invocation.Arguments.Select((a, index) =>
+                {
+                    var p = parameters[index];
+
+                    Expression expression = Expression.Constant(a);
+
+                    if (a.GetType() != p.ParameterType)
+                    {
+                        expression = Expression.Convert(expression, p.ParameterType);
+                    }
+
+                    return expression;
+                }).ToArray();
+
                 object GetDelegate(object instance, MethodInfo delegateMethod)
                 {
                     var instancExpression = Expression.Constant(instance);
                     var parameterExpressions = delegateMethod.GetParameters().Select(p => Expression.Parameter(p.ParameterType, p.Name)).ToArray();
                     var callExpression = Expression.Call(instancExpression, method, parameterExpressions);
-                    return Expression.Lambda(Expression.Invoke(Expression.Lambda(callExpression, parameterExpressions),
-                        argumentsExpressions)).Compile();
+
+                    return Expression.Lambda(Expression.Invoke(Expression.Lambda(callExpression, parameterExpressions), argumentsExpressions)).Compile();
                 }
 
                 var mainDelegate = GetDelegate(_proxyInstance, method);

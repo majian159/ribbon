@@ -7,6 +7,7 @@ using Ribbon.Client.Http;
 using Ribbon.LoadBalancer.ConsulDiscovery;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -104,7 +105,13 @@ namespace ConsoleApp
                 .FallbackType(typeof(BookAggregationCommentGoClient))
                 .Target<IBookAggregationCommentGoClient>();
 
-            var tt=go.GetAggregationCommentsAsync(2048, 0, 0, 10).GetAwaiter().GetResult();
+            var tt = go.GetAggregationCommentsAsync(2048, 0, 0, 10).GetAwaiter().GetResult();
+
+            var sw=Stopwatch.StartNew();
+            Parallel.For(0, 1000,
+                (i) => { tt = go.GetAggregationCommentsAsync(2048, 0, 0, 10).GetAwaiter().GetResult(); });
+            sw.Stop();
+            Console.WriteLine(sw.ElapsedMilliseconds+"ms");
 
             return;
 
