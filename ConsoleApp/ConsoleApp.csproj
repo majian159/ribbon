@@ -11,9 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\src\Rabbit.Feign\Rabbit.Feign.csproj" />
     <ProjectReference Include="..\src\Ribbon.Client.Http\Ribbon.Client.Http.csproj" />
     <ProjectReference Include="..\src\Ribbon.Client\Ribbon.Client.csproj" />
-    <ProjectReference Include="..\src\Ribbon.LoadBalancer.Consul\Ribbon.LoadBalancer.ConsulDiscovery.csproj" />
+    <ProjectReference Include="..\src\Ribbon.LoadBalancer.ConsulDiscovery\Ribbon.LoadBalancer.ConsulDiscovery.csproj" />
     <ProjectReference Include="..\src\Ribbon.Loadbalancer\Ribbon.LoadBalancer.csproj" />
   </ItemGroup>
 

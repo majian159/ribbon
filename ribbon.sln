@@ -24,7 +24,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		versions.props = versions.props
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ribbon.Client.Abstractions", "src\Ribbon.Client.Abstractions\Ribbon.Client.Abstractions.csproj", "{0467C270-B381-44B3-ACAB-F30A16C622CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ribbon.Client.Abstractions", "src\Ribbon.Client.Abstractions\Ribbon.Client.Abstractions.csproj", "{0467C270-B381-44B3-ACAB-F30A16C622CA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rabbit.Feign", "src\Rabbit.Feign\Rabbit.Feign.csproj", "{AA900442-5D6D-4830-BF1E-A61509F00A70}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -68,6 +70,10 @@ Global
 		{0467C270-B381-44B3-ACAB-F30A16C622CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0467C270-B381-44B3-ACAB-F30A16C622CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0467C270-B381-44B3-ACAB-F30A16C622CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA900442-5D6D-4830-BF1E-A61509F00A70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA900442-5D6D-4830-BF1E-A61509F00A70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA900442-5D6D-4830-BF1E-A61509F00A70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA900442-5D6D-4830-BF1E-A61509F00A70}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
