@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Rabbit.Feign.Reflective;
-using Rabbit.Go.Core.Builder;
 using System;
 
 namespace Rabbit.Feign
@@ -15,7 +14,7 @@ namespace Rabbit.Feign
             }
 
             services
-                .AddTransient<GoBuilder>()
+                .AddTransient<FeignBuilder>()
                 .AddSingleton<IParameterExpanderLocator, ParameterExpanderLocator>();
 
             return services;

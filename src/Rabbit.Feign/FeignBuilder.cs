@@ -8,9 +8,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 
-namespace Rabbit.Go.Core.Builder
+namespace Rabbit.Feign
 {
-    public class GoBuilder
+    public class FeignBuilder
     {
         private readonly IServiceProvider _services;
         private static readonly ProxyGenerator ProxyGenerator = new ProxyGenerator();
@@ -20,30 +20,30 @@ namespace Rabbit.Go.Core.Builder
         private string _clientName;
         private Type _fallbackType;
 
-        public GoBuilder(IServiceProvider services)
+        public FeignBuilder(IServiceProvider services)
         {
             _services = services;
         }
 
-        public GoBuilder Encoder(IEncoder encoder)
+        public FeignBuilder Encoder(IEncoder encoder)
         {
             _encoder = encoder;
             return this;
         }
 
-        public GoBuilder Decoder(IDecoder decoder)
+        public FeignBuilder Decoder(IDecoder decoder)
         {
             _decoder = decoder;
             return this;
         }
 
-        public GoBuilder ClientName(string clientName)
+        public FeignBuilder ClientName(string clientName)
         {
             _clientName = clientName;
             return this;
         }
 
-        public GoBuilder FallbackType(Type fallbackType)
+        public FeignBuilder FallbackType(Type fallbackType)
         {
             _fallbackType = fallbackType;
             return this;
@@ -86,6 +86,10 @@ namespace Rabbit.Go.Core.Builder
 
             var feignProxy = ProxyGenerator.CreateInterfaceProxyWithoutTarget(type, Enumerable.Empty<Type>().ToArray(), goInterceptor);
 
+            if (_fallbackType == null)
+            {
+                return feignProxy;
+            }
             return ProxyGenerator.CreateInterfaceProxyWithTarget(type, feignProxy,
                 new HystrixInterceptor(type, feignProxy, _fallbackType, _services));
         }

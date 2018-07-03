@@ -2,8 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Rabbit.Feign;
-using Rabbit.Feign.Codec;
-using Rabbit.Go.Core.Builder;
 using Ribbon.Client;
 using Ribbon.Client.Http;
 using Ribbon.LoadBalancer.ConsulDiscovery;
@@ -99,7 +97,7 @@ namespace ConsoleApp
 
             var services = serviceCollection.BuildServiceProvider();
 
-            var goBuilder = services.GetRequiredService<GoBuilder>();
+            var goBuilder = services.GetRequiredService<FeignBuilder>();
 
             var go=goBuilder
                 .ClientName("cs.comment")
