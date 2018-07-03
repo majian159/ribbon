@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Ribbon.LoadBalancer.Impl.Ping;
 using Ribbon.LoadBalancer.Impl.Rule;
 using Ribbon.LoadBalancer.Impl.ServerList;
 using System;
@@ -61,11 +60,6 @@ namespace Ribbon.LoadBalancer
         /// <inheritdoc/>
         public void PostConfigure(string name, LoadBalancerOptions options)
         {
-            if (options.Ping == null)
-            {
-                options.Ping = NoOpPing.Default;
-            }
-
             if (options.Rule == null)
             {
                 options.Rule = new RoundRobinRule();

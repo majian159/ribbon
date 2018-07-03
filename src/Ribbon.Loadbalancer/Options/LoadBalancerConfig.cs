@@ -13,6 +13,8 @@ namespace Ribbon.LoadBalancer
 
     public class LoadBalancerConfig : ILoadBalancerSettings
     {
+        public static readonly LoadBalancerConfig Default = new LoadBalancerConfig();
+
         public LoadBalancerConfig()
         {
             LoadBalancerPingInterval = TimeSpan.FromSeconds(30);

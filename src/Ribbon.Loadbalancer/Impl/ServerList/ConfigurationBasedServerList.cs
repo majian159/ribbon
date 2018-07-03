@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 
 namespace Ribbon.LoadBalancer.Impl.ServerList
@@ -16,17 +15,17 @@ namespace Ribbon.LoadBalancer.Impl.ServerList
         #region Implementation of IServerList<out Server>
 
         /// <inheritdoc/>
-        public Task<IReadOnlyList<Server>> GetInitialListOfServersAsync()
+        public Task<Server[]> GetInitialListOfServersAsync()
         {
             return GetUpdatedListOfServersAsync();
         }
 
         /// <inheritdoc/>
-        public Task<IReadOnlyList<Server>> GetUpdatedListOfServersAsync()
+        public Task<Server[]> GetUpdatedListOfServersAsync()
         {
             var listOfServers = _settings.ListOfServers;
 
-            IReadOnlyList<Server> servers;
+            Server[] servers;
             if (listOfServers == null || !listOfServers.Any())
             {
                 servers = Enumerable.Empty<Server>().ToArray();

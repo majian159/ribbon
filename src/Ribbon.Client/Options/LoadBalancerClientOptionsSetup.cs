@@ -38,7 +38,7 @@ namespace Ribbon.Client
         {
             var loadBalancerOptions = _loadBalancerOptionsMonitor.Get(name);
 
-            var loadBalancer = new DefaultLoadBalancer(loadBalancerOptions);
+            var loadBalancer = new DynamicServerListLoadBalancer(name, loadBalancerOptions);
 
             options.LoadBalancer = loadBalancer;
 

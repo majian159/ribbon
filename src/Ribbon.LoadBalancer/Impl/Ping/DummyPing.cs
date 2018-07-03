@@ -2,9 +2,9 @@
 
 namespace Ribbon.LoadBalancer.Impl.Ping
 {
-    public class NoOpPing : IPing
+    public class DummyPing : IPing
     {
-        public static readonly IPing Default = new NoOpPing();
+        public static DummyPing Default = new DummyPing();
 
         #region Implementation of IPing
 
