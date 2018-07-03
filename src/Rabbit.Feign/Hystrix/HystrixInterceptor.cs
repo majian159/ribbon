@@ -149,7 +149,7 @@ namespace Rabbit.Feign.Hystrix
                 var fallbackInstance = ActivatorUtilities.GetServiceOrCreateInstance(_services, _hystrixType);
 
                 var parameters = method.GetParameters();
-                var argumentsExpressions = invocation.Arguments.Select((a, index) =>
+                var argumentsExpressions = args.Select((a, index) =>
                 {
                     var p = parameters[index];
 

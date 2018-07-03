@@ -83,8 +83,7 @@ namespace ConsoleApp
                     {"client1:ribbon:OkToRetryOnAllOperations","true" },
                     {"client1:ribbon:ListOfServers:0","https://www.baidu.com" },
                     {"client1:ribbon:ListOfServers:1","http://www.baidu.com" },
-                    {"client1:ribbon:Timeout","00:02:00" },
-                    {"hystrix:command:GetAggregationCommentsAsync:circuitBreaker:forceOpen","true" }
+                    {"client1:ribbon:Timeout","00:02:00" }
                 })
                 .Build();
 
@@ -106,12 +105,13 @@ namespace ConsoleApp
                 .Target<IBookAggregationCommentGoClient>();
 
             var tt = go.GetAggregationCommentsAsync(2048, 0, 0, 10).GetAwaiter().GetResult();
-
             var sw=Stopwatch.StartNew();
             Parallel.For(0, 1000,
                 (i) => { tt = go.GetAggregationCommentsAsync(2048, 0, 0, 10).GetAwaiter().GetResult(); });
             sw.Stop();
             Console.WriteLine(sw.ElapsedMilliseconds+"ms");
+
+            Console.ReadLine();
 
             return;
 
