@@ -8,7 +8,7 @@ using System;
 
 namespace Ribbon.Client
 {
-    public class LoadBalancerClientOptionsSetup : IConfigureNamedOptions<LoadBalancerClientOptions>
+    public class LoadBalancerClientOptionsSetup : IConfigureNamedOptions<LoadBalancerClientOptions>, IPostConfigureOptions<LoadBalancerClientOptions>
     {
         private readonly IOptionsMonitor<LoadBalancerOptions> _loadBalancerOptionsMonitor;
         private readonly IOptionsMonitor<RetryHandlerConfig> _retryHandlerOptionsMonitor;
@@ -31,7 +31,7 @@ namespace Ribbon.Client
 
         #endregion Implementation of IConfigureOptions<in LoadBalancerClientOptions>
 
-        #region Implementation of IConfigureNamedOptions<in ClientOptions>
+        #region Implementation of IConfigureNamedOptions<in LoadBalancerClientOptions>
 
         /// <inheritdoc/>
         public void Configure(string name, LoadBalancerClientOptions options)
@@ -41,9 +41,6 @@ namespace Ribbon.Client
             var loadBalancer = new DynamicServerListLoadBalancer(name, loadBalancerOptions);
 
             options.LoadBalancer = loadBalancer;
-
-            var retryHandlerOptions = _retryHandlerOptionsMonitor.Get(name);
-            options.RetryHandler = new DefaultLoadBalancerRetryHandler(retryHandlerOptions);
 
             var loadBalancerClientConfig = _loadBalancerClientConfigMonitor.Get(name);
 
@@ -55,6 +52,20 @@ namespace Ribbon.Client
             }
         }
 
-        #endregion Implementation of IConfigureNamedOptions<in ClientOptions>
+        #endregion Implementation of IConfigureNamedOptions<in LoadBalancerClientOptions>
+
+        #region Implementation of IPostConfigureOptions<in LoadBalancerClientOptions>
+
+        /// <inheritdoc/>
+        public void PostConfigure(string name, LoadBalancerClientOptions options)
+        {
+            if (options.RetryHandler == null)
+            {
+                var retryHandlerOptions = _retryHandlerOptionsMonitor.Get(name);
+                options.RetryHandler = new DefaultLoadBalancerRetryHandler(retryHandlerOptions);
+            }
+        }
+
+        #endregion Implementation of IPostConfigureOptions<in LoadBalancerClientOptions>
     }
 }

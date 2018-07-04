@@ -17,10 +17,6 @@ namespace Ribbon.Client.Impl
             typeof(TimeoutException),typeof(SocketException)
         };
 
-        public DefaultLoadBalancerRetryHandler()
-        {
-        }
-
         protected uint RetrySameServer { get; set; }
 
         protected uint RetryNextServer { get; set; }
@@ -30,30 +26,28 @@ namespace Ribbon.Client.Impl
         /// <inheritdoc/>
         public DefaultLoadBalancerRetryHandler(uint retrySameServer, uint retryNextServer, bool retryEnabled)
         {
-            RetrySameServer = retrySameServer;
-            RetryNextServer = retryNextServer;
+            RetrySameServer = Math.Max(retrySameServer, 0);
+            RetryNextServer = Math.Max(retryNextServer, 0);
             RetryEnabled = retryEnabled;
         }
 
         public DefaultLoadBalancerRetryHandler(RetryHandlerConfig options)
+            : this(options.MaxAutoRetries, options.MaxAutoRetriesNextServer, options.OkToRetryOnAllOperations)
         {
-            RetrySameServer = options.MaxAutoRetries;
-            RetryNextServer = options.MaxAutoRetriesNextServer;
-            RetryEnabled = options.OkToRetryOnAllOperations;
         }
 
         #region Implementation of IRetryHandler
 
         /// <inheritdoc/>
-        public bool IsRetriableException(Exception exception, bool sameServer)
+        public virtual bool IsRetriableException(Exception exception, bool sameServer)
         {
-            return RetryEnabled && (!sameServer || Utils.IsPresentAsCause(exception, GetRetriableExceptions()));
+            return RetryEnabled && (!sameServer || Utils.IsPresentAsException(exception, GetRetriableExceptions()));
         }
 
         /// <inheritdoc/>
-        public bool IsCircuitTrippingException(Exception exception)
+        public virtual bool IsCircuitTrippingException(Exception exception)
         {
-            return Utils.IsPresentAsCause(exception, GetCircuitRelatedExceptions());
+            return Utils.IsPresentAsException(exception, GetCircuitRelatedExceptions());
         }
 
         /// <inheritdoc/>

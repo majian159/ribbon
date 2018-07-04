@@ -10,6 +10,7 @@ namespace Ribbon.Client.Http
             builder
                 .Services
                 .AddHttpClient()
+                .ConfigureOptions<HttpLoadBalancerClientOptionsSetup>()
                 .ConfigureOptions<HttpClientFactoryOptionsSetup>()
                 .ConfigureOptions<RibbonHttpClientOptionsSetup>();
 
