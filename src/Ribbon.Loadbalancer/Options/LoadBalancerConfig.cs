@@ -8,6 +8,7 @@ namespace Ribbon.LoadBalancer
         string LoadBalancerPingTypeName { get; }
         string LoadBalancerServerListTypeName { get; }
         string ServerListUpdaterTypeName { get; }
+        string ServerListFilterTypeName { get; }
         TimeSpan LoadBalancerPingInterval { get; }
     }
 
@@ -37,6 +38,9 @@ namespace Ribbon.LoadBalancer
 
         /// <inheritdoc/>
         public string ServerListUpdaterTypeName { get; set; }
+
+        /// <inheritdoc/>
+        public string ServerListFilterTypeName { get; set; }
 
         /// <inheritdoc/>
         public TimeSpan LoadBalancerPingInterval { get; }

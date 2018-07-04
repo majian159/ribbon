@@ -1,5 +1,6 @@
 ﻿using Consul;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Steeltoe.Discovery.Consul.Discovery;
 using System;
@@ -10,10 +11,15 @@ namespace Ribbon.LoadBalancer.ConsulDiscovery
     {
         private readonly IServiceProvider _services;
         private static readonly ConsulPing Ping = new ConsulPing();
+        private static HealthServiceServerListFilter _healthServiceServerListFilter;
 
         public ConsulLoadBalancerOptionsSetup(IServiceProvider services)
         {
             _services = services;
+            if (_healthServiceServerListFilter == null)
+            {
+                _healthServiceServerListFilter = new HealthServiceServerListFilter(services.GetRequiredService<ILogger<HealthServiceServerListFilter>>());
+            }
         }
 
         #region Implementation of IConfigureOptions<in LoadBalancerOptions>
@@ -38,6 +44,7 @@ namespace Ribbon.LoadBalancer.ConsulDiscovery
 
             var serverListTypeName = options.Settings.LoadBalancerServerListTypeName;
             var pingTypeName = options.Settings.LoadBalancerPingTypeName;
+            var serverListFilterTypeName = options.Settings.ServerListFilterTypeName;
 
             if (!string.IsNullOrEmpty(serverListTypeName) && Type.GetType(serverListTypeName) != typeof(ConsulServerList))
             {
@@ -49,6 +56,12 @@ namespace Ribbon.LoadBalancer.ConsulDiscovery
             if (pingTypeName == null || Type.GetType(pingTypeName) == typeof(ConsulPing))
             {
                 options.Ping = Ping;
+            }
+
+            if (serverListFilterTypeName == null ||
+                Type.GetType(serverListFilterTypeName) == typeof(HealthServiceServerListFilter))
+            {
+                options.ServerListFilter = _healthServiceServerListFilter;
             }
         }
 

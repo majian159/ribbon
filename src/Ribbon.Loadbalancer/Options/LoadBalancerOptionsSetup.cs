@@ -48,6 +48,7 @@ namespace Ribbon.LoadBalancer
                 options.ServerListUpdater = TryGetInstance<IServerListUpdater>(settings.ServerListUpdaterTypeName);
             }
 
+            options.ServerListFilter = TryGetInstance<IServerListFilter<Server>>(settings.ServerListFilterTypeName);
             options.Ping = TryGetInstance<IPing>(settings.LoadBalancerPingTypeName);
 
             options.Settings = settings;

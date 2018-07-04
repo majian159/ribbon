@@ -6,6 +6,7 @@
         public IPing Ping { get; set; }
         public IServerList<Server> ServerList { get; set; }
         public IServerListUpdater ServerListUpdater { get; set; }
+        public IServerListFilter<Server> ServerListFilter { get; set; }
         public ILoadBalancerSettings Settings { get; set; }
     }
 }
