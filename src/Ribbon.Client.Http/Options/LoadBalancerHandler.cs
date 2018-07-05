@@ -1,4 +1,6 @@
-﻿using Ribbon.LoadBalancer;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Ribbon.LoadBalancer;
 using Ribbon.LoadBalancer.Util;
 using System;
 using System.Net.Http;
@@ -11,14 +13,16 @@ namespace Ribbon.Client.Http.Options
     {
         private readonly string _name;
         private readonly LoadBalancerClientOptions _loadBalancerClientOptions;
+        private readonly ILogger<LoadBalancerClientHandler> _logger;
 
-        public LoadBalancerClientHandler(string name, LoadBalancerClientOptions loadBalancerClientOptions)
+        public LoadBalancerClientHandler(string name, LoadBalancerClientOptions loadBalancerClientOptions, ILogger<LoadBalancerClientHandler> logger)
         {
             _name = name;
             _loadBalancerClientOptions = loadBalancerClientOptions;
+            _logger = logger ?? NullLogger<LoadBalancerClientHandler>.Instance;
         }
 
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var loadBalancer = _loadBalancerClientOptions.LoadBalancer;
 
@@ -50,7 +54,7 @@ namespace Ribbon.Client.Http.Options
 
                     request.RequestUri = LoadBalancerUtil.ReconstructUriWithServer(server, request.RequestUri);
 
-                    return base.SendAsync(request, cancellationToken);
+                    return await base.SendAsync(request, cancellationToken);
                 }
                 catch (Exception e)
                 {
@@ -59,13 +63,12 @@ namespace Ribbon.Client.Http.Options
                         loadBalancer.MarkServerDown(server);
                     }
 
-                    if (!retryHandler.IsRetriableException(e, false) || i == maxRetriesOnNextServer)
+                    if (!retryHandler.IsRetriableException(e, false) || i + 1 == maxRetriesOnNextServer)
                     {
                         throw;
                     }
-                    //todo:logging
 
-                    continue;
+                    _logger.LogError(e,"");
                 }
             }
 

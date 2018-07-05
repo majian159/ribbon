@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,11 +11,13 @@ namespace Ribbon.Client.Http.Options
     {
         private readonly string _name;
         private readonly LoadBalancerClientOptions _loadBalancerClientOptions;
+        private readonly ILogger<SameRetryHandler> _logger;
 
-        public SameRetryHandler(string name, LoadBalancerClientOptions loadBalancerClientOptions)
+        public SameRetryHandler(string name, LoadBalancerClientOptions loadBalancerClientOptions, ILogger<SameRetryHandler> logger)
         {
             _name = name;
             _loadBalancerClientOptions = loadBalancerClientOptions;
+            _logger = logger ?? NullLogger<SameRetryHandler>.Instance;
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -35,12 +39,11 @@ namespace Ribbon.Client.Http.Options
                 }
                 catch (Exception e)
                 {
-                    if (!retryHandler.IsRetriableException(e, true) || i == maxRetriesOnSameServer)
+                    if (!retryHandler.IsRetriableException(e, true) || i + 1 == maxRetriesOnSameServer)
                     {
                         throw;
                     }
-                    //todo:logging
-                    continue;
+                    _logger.LogError(e, "");
                 }
             }
 
