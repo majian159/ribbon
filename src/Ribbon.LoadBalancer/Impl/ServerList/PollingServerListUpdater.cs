@@ -8,28 +8,29 @@ namespace Ribbon.LoadBalancer.Impl.ServerList
     {
         private readonly LoadBalancerConfig _config;
         private readonly Timer _timer;
-        private Func<Task> _updateAction;
+        protected Func<Task> UpdateAction { get; private set; }
+
+        protected bool Processing { get; set; }
 
         public PollingServerListUpdater(LoadBalancerConfig config)
         {
             _config = config;
-            var processing = false;
             _timer = new Timer(async s =>
             {
-                if (_updateAction == null || processing)
+                if (UpdateAction == null || Processing)
                 {
                     return;
                 }
 
-                processing = true;
+                Processing = true;
 
                 try
                 {
-                    await _updateAction();
+                    await UpdateAction();
                 }
                 finally
                 {
-                    processing = false;
+                    Processing = false;
                 }
             }, null, -1, -1);
         }
@@ -37,9 +38,10 @@ namespace Ribbon.LoadBalancer.Impl.ServerList
         #region Implementation of IServerListUpdater
 
         /// <inheritdoc/>
-        public void Start(Func<Task> updateAction)
+        public virtual void Start(Func<Task> updateAction)
         {
-            _updateAction = updateAction;
+            UpdateAction = updateAction;
+
             if (updateAction == null)
             {
                 _timer.Change(-1, -1);
@@ -51,7 +53,7 @@ namespace Ribbon.LoadBalancer.Impl.ServerList
         }
 
         /// <inheritdoc/>
-        public void Stop()
+        public virtual void Stop()
         {
             _timer.Change(TimeSpan.MinValue, TimeSpan.MinValue);
         }

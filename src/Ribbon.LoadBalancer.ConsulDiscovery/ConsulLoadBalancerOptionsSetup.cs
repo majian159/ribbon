@@ -63,6 +63,12 @@ namespace Ribbon.LoadBalancer.ConsulDiscovery
             {
                 options.ServerListFilter = _healthServiceServerListFilter;
             }
+
+            if (options.ServerListUpdater == null)
+            {
+                var loadBalancerConfig = _services.GetService<IOptionsMonitor<LoadBalancerConfig>>().Get(name);
+                options.ServerListUpdater = new FastConsulServerListUpdater(name, _services, loadBalancerConfig);
+            }
         }
 
         #endregion Implementation of IConfigureNamedOptions<in LoadBalancerOptions>
