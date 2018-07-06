@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,15 +36,33 @@ namespace Ribbon.Client.Http.Options
                 try
                 {
                     var responseMessage = await base.SendAsync(request, cancellationToken);
+
+                    if (responseMessage.StatusCode == HttpStatusCode.ServiceUnavailable)
+                    {
+                        responseMessage.Dispose();
+                        throw new ClientException(ClientException.ErrorType.ServerThrottled);
+                    }
+
                     return responseMessage;
                 }
                 catch (Exception e)
                 {
-                    if (!retryHandler.IsRetriableException(e, true) || i + 1 == maxRetriesOnSameServer)
+                    if (i + 1 == maxRetriesOnSameServer)
+                    {
+                        throw new ClientException(ClientException.ErrorType.NumberofRetriesExceeded,
+                            $"Number of retries exceeded max {maxRetriesOnSameServer - 1} retries, while making a call for: {request.RequestUri}",
+                            e);
+                    }
+
+                    if (!retryHandler.IsRetriableException(e, true))
                     {
                         throw;
                     }
-                    _logger.LogError(e, "");
+
+                    if (_logger.IsEnabled(LogLevel.Debug))
+                    {
+                        _logger.LogDebug(e, $"Got error {e} when executed on {request.RequestUri}");
+                    }
                 }
             }
 

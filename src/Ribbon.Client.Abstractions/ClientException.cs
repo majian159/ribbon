@@ -9,7 +9,7 @@ namespace Ribbon.Client
             General,
             Configuration,
             NumberofRetriesExceeded,
-            NumberofRetriesNextserverExceeded,
+            NumberofRetriesNextServerExceeded,
             TimeoutException,
             UnknownHostException,
             ConnectException,
@@ -30,20 +30,24 @@ namespace Ribbon.Client
         {
         }
 
-        public ClientException(int errorCode, string message, Exception innerException) : base(message == null && errorCode != 0 ? ", code=" + errorCode + "->" + errorCode : message, innerException)
+        public ClientException(int errorCode, string message, Exception innerException)
+            : base(message == null && errorCode != 0 ? ", code=" + errorCode + "->" + (ErrorType)errorCode : message, innerException)
         {
             ErrorCode = errorCode;
         }
 
-        public ClientException(ErrorType type) : this((int)type, null, null)
+        public ClientException(ErrorType type)
+            : this((int)type, null, null)
         {
         }
 
-        public ClientException(ErrorType type, string message) : this((int)type, message, null)
+        public ClientException(ErrorType type, string message)
+            : this((int)type, message, null)
         {
         }
 
-        public ClientException(ErrorType type, string message, Exception innerException) : base(message == null && type != ErrorType.General ? ", code=" + type + "->" + type : message, innerException)
+        public ClientException(ErrorType type, string message, Exception innerException)
+            : base(message == null && type != ErrorType.General ? ", code=" + (int)type + "->" + type : message, innerException)
         {
             ErrorCode = (int)type;
             Type = type;

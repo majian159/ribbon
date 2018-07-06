@@ -58,9 +58,23 @@ namespace Ribbon.Client.Http.Options
                 }
                 catch (Exception e)
                 {
+                    var isNumberofRetriesNextServerExceeded = i + 1 == maxRetriesOnNextServer;
+
+                    if (isNumberofRetriesNextServerExceeded)
+                    {
+                        e = new ClientException(ClientException.ErrorType.NumberofRetriesNextServerExceeded,
+                            $"Number of retries on next server exceeded max {maxRetriesOnNextServer - 1} retries, while making a call for: {server}",
+                            e);
+                    }
+
                     if (retryHandler.IsCircuitTrippingException(e) && server != null)
                     {
                         loadBalancer.MarkServerDown(server);
+                    }
+
+                    if (isNumberofRetriesNextServerExceeded)
+                    {
+                        throw (ClientException)e;
                     }
 
                     if (!retryHandler.IsRetriableException(e, false) || i + 1 == maxRetriesOnNextServer)
@@ -68,7 +82,10 @@ namespace Ribbon.Client.Http.Options
                         throw;
                     }
 
-                    _logger.LogError(e,"");
+                    if (_logger.IsEnabled(LogLevel.Debug))
+                    {
+                        _logger.LogDebug(e, $"Got error {e} when executed on server {server}");
+                    }
                 }
             }
 

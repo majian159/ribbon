@@ -13,14 +13,24 @@ namespace Ribbon.LoadBalancer.Impl.ServerList
         public PollingServerListUpdater(LoadBalancerConfig config)
         {
             _config = config;
+            var processing = false;
             _timer = new Timer(async s =>
             {
-                if (_updateAction == null)
+                if (_updateAction == null || processing)
                 {
                     return;
                 }
 
-                await _updateAction();
+                processing = true;
+
+                try
+                {
+                    await _updateAction();
+                }
+                finally
+                {
+                    processing = false;
+                }
             }, null, -1, -1);
         }
 
