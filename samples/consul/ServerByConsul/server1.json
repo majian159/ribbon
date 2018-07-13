@@ -1,0 +1,21 @@
+﻿{
+  "urls": "http://+:6001",
+  "Consul": {
+    "Host": "localhost",
+    "Port": 8500,
+    "Discovery": {
+      "HostName": "localhost",
+      "Port": "6001"
+    }
+  },
+  "Spring": {
+    "Application": {
+      "Name": "timeService"
+    }
+  },
+  "Management": {
+    "Endpoints": {
+      "Path": "/actuator"
+    }
+  }
+}

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="..\..\versions.props" />
 
@@ -7,7 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\steeltoe-extensions\src\discovery\Steeltoe.Discovery.ConsulBase\Steeltoe.Discovery.ConsulBase.csproj" />
+    <PackageReference Include="Rabbit.Discovery.Consul.Client" Version="1.0.0-preview1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Ribbon.Core\Ribbon.Core.csproj" />
     <ProjectReference Include="..\Ribbon.Loadbalancer\Ribbon.LoadBalancer.csproj" />
   </ItemGroup>

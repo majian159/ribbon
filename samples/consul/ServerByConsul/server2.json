@@ -1,0 +1,25 @@
+﻿{
+  "urls": "http://+:6002",
+  "Consul": {
+    "Host": "localhost",
+    "Port": 8500,
+    "Discovery": {
+      "HostName": "localhost",
+      "Port": "6002",
+      "HealthCheckPath": null,
+      "Heartbeat": {
+        "Enable": true
+      }
+    }
+  },
+  "Spring": {
+    "Application": {
+      "Name": "timeService"
+    }
+  },
+  "Management": {
+    "Endpoints": {
+      "Path": "/actuator"
+    }
+  }
+}
