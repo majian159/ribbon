@@ -9,6 +9,7 @@ namespace Rabbit.Feign.Hystrix
     {
         private readonly Func<Task<T>> _runAsync;
         private readonly Func<Task<T>> _fallbackAsync;
+        private readonly ILogger _logger;
 
         public SimpleHystrixCommand(IHystrixCommandOptions options, Func<T> run, Func<T> fallback, ILogger logger = null) : base(options, run, fallback, logger)
         {
@@ -18,14 +19,23 @@ namespace Rabbit.Feign.Hystrix
         {
             _runAsync = runAsync;
             _fallbackAsync = fallbackAsync;
+            _logger = logger;
         }
 
         #region Overrides of HystrixCommand<T>
 
         /// <inheritdoc/>
-        protected override Task<T> RunAsync()
+        protected override async Task<T> RunAsync()
         {
-            return _runAsync();
+            try
+            {
+                return await _runAsync();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "HystrixCommand run execute fail.");
+                throw;
+            }
         }
 
         protected override Task<T> RunFallbackAsync()
