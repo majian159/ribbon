@@ -25,6 +25,12 @@ namespace Rabbit.Feign.Hystrix
         #region Overrides of HystrixCommand<T>
 
         /// <inheritdoc/>
+        protected override T Run()
+        {
+            return Task.Run(async () => await RunAsync()).GetAwaiter().GetResult();
+        }
+
+        /// <inheritdoc/>
         protected override async Task<T> RunAsync()
         {
             try
@@ -40,7 +46,7 @@ namespace Rabbit.Feign.Hystrix
 
         protected override Task<T> RunFallbackAsync()
         {
-            return _fallbackAsync();
+            return _fallbackAsync == null ? base.RunFallbackAsync() : _fallbackAsync();
         }
 
         #endregion Overrides of HystrixCommand<T>

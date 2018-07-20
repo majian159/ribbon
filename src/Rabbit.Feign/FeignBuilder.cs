@@ -86,10 +86,6 @@ namespace Rabbit.Feign
 
             var feignProxy = ProxyGenerator.CreateInterfaceProxyWithoutTarget(type, Enumerable.Empty<Type>().ToArray(), goInterceptor);
 
-            if (_fallbackType == null)
-            {
-                return feignProxy;
-            }
             return ProxyGenerator.CreateInterfaceProxyWithTarget(type, feignProxy,
                 new HystrixInterceptor(type, feignProxy, _fallbackType, _services));
         }

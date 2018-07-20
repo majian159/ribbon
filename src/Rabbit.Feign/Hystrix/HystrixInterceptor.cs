@@ -19,7 +19,7 @@ namespace Rabbit.Feign.Hystrix
         private readonly object _proxyInstance;
         private readonly Type _hystrixType;
         private readonly IServiceProvider _services;
-        private ConcurrentDictionary<MethodInfo, Func<object[], object>> _commands = new ConcurrentDictionary<MethodInfo, Func<object[], object>>();
+        private readonly ConcurrentDictionary<MethodInfo, Func<object[], object>> _commands = new ConcurrentDictionary<MethodInfo, Func<object[], object>>();
 
         public HystrixInterceptor(Type pryxyType, object proxyInstance, Type hystrixType, IServiceProvider services)
         {
@@ -131,22 +131,13 @@ namespace Rabbit.Feign.Hystrix
                 GroupKey = groupKey
             };
 
-            var fallbackMethod = _hystrixType.GetMethod(fallbackMethodName, method.GetParameters().Select(p => p.ParameterType).ToArray());
-
-            if (fallbackMethod == null)
-            {
-                return null;
-            }
-
-            return (args) =>
+            return args =>
             {
                 var returnType = method.ReturnType;
 
                 var isTask = typeof(Task).IsAssignableFrom(returnType);
 
                 var realType = isTask ? returnType.IsGenericType ? returnType.GenericTypeArguments[0] : typeof(object) : returnType;
-
-                var fallbackInstance = ActivatorUtilities.GetServiceOrCreateInstance(_services, _hystrixType);
 
                 var parameters = method.GetParameters();
                 var argumentsExpressions = args.Select((a, index) =>
@@ -155,7 +146,11 @@ namespace Rabbit.Feign.Hystrix
 
                     Expression expression = Expression.Constant(a);
 
-                    if (a.GetType() != p.ParameterType)
+                    if (a == null)
+                    {
+                        expression = Expression.Constant(null, p.ParameterType);
+                    }
+                    else if (a.GetType() != p.ParameterType)
                     {
                         expression = Expression.Convert(expression, p.ParameterType);
                     }
@@ -172,14 +167,28 @@ namespace Rabbit.Feign.Hystrix
                     return Expression.Lambda(Expression.Invoke(Expression.Lambda(callExpression, parameterExpressions), argumentsExpressions)).Compile();
                 }
 
+                object GetFallbackDelegate()
+                {
+                    var fallbackMethod = _hystrixType?.GetMethod(fallbackMethodName, method.GetParameters().Select(p => p.ParameterType).ToArray());
+
+                    if (fallbackMethod == null)
+                    {
+                        return null;
+                    }
+
+                    var fallbackInstance = ActivatorUtilities.GetServiceOrCreateInstance(_services, _hystrixType);
+                    return GetDelegate(fallbackInstance, fallbackMethod);
+                }
+
                 var mainDelegate = GetDelegate(_proxyInstance, method);
-                var fallbackDelegate = GetDelegate(fallbackInstance, fallbackMethod);
+                var fallbackDelegate = GetFallbackDelegate();
+                var delegateType = mainDelegate.GetType();
 
                 var commandType = typeof(SimpleHystrixCommand<>).MakeGenericType(realType);
                 var loggerFactory = _services.GetService<ILoggerFactory>();
                 var logger = loggerFactory?.CreateLogger(commandType);
 
-                var constructorInfo = commandType.GetConstructor(new[] { typeof(IHystrixCommandOptions), mainDelegate.GetType(), fallbackDelegate.GetType(), typeof(ILogger) });
+                var constructorInfo = commandType.GetConstructor(new[] { typeof(IHystrixCommandOptions), delegateType, delegateType, typeof(ILogger) });
                 return constructorInfo.Invoke(new object[] { opts, mainDelegate, fallbackDelegate, logger });
             };
         }
