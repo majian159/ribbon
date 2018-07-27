@@ -1,10 +1,11 @@
 ﻿using Castle.DynamicProxy;
 using Rabbit.Feign.Utilities;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net.Http;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Rabbit.Feign.Reflective
@@ -30,51 +31,47 @@ namespace Rabbit.Feign.Reflective
         public void Intercept(IInvocation invocation)
         {
             var returnType = invocation.Method.ReturnType;
-            if (typeof(Task).IsAssignableFrom(returnType))
+
+            var isTask = typeof(Task).IsAssignableFrom(returnType);
+
+            if (isTask)
             {
                 if (returnType.IsGenericType)
                 {
-                    var method = typeof(FeignInterceptor).GetMethod(nameof(HandleAsync), BindingFlags.NonPublic | BindingFlags.Instance)
-                        .MakeGenericMethod(invocation.Method.ReturnType.GenericTypeArguments[0]);
-                    invocation.ReturnValue = method.Invoke(this, new object[] { invocation });
+                    var result = GetHandler(invocation.Method.ReturnType)(invocation);
+                    invocation.ReturnValue = result;
                 }
                 else
                 {
-                    invocation.ReturnValue = HandleTaskAsync(invocation);
+                    invocation.ReturnValue = DoHandleAsync(invocation);
                 }
             }
             else
             {
-                invocation.ReturnValue = Handle(invocation);
+                invocation.ReturnValue = DoHandleAsync(invocation).GetAwaiter().GetResult();
             }
         }
 
         #endregion Implementation of IInterceptor
 
-        private async Task HandleTaskAsync(IInvocation invocation)
-        {
-            await DoHandleAsync(invocation);
-        }
-
         private async Task<T> HandleAsync<T>(IInvocation invocation)
         {
-            var value = await DoHandleAsync(invocation);
-
-            switch (value)
-            {
-                case null:
-                    return default(T);
-
-                case Task<T> task:
-                    return await task;
-            }
-
-            return (T)value;
+            var result = await DoHandleAsync(invocation);
+            return (T)result;
         }
 
-        private object Handle(IInvocation invocation)
+        private readonly ConcurrentDictionary<Type, Func<IInvocation, object>> _handleCaches = new ConcurrentDictionary<Type, Func<IInvocation, object>>();
+
+        public Func<IInvocation, object> GetHandler(Type type)
         {
-            return DoHandleAsync(invocation).GetAwaiter().GetResult();
+            return _handleCaches.GetOrAdd(type, k =>
+            {
+                var invocationParameterExpression = Expression.Parameter(typeof(IInvocation));
+                var t = Expression.Lambda<Func<IInvocation, object>>(
+                    Expression.Call(Expression.Constant(this), nameof(HandleAsync), new[] { type.GenericTypeArguments[0] },
+                        invocationParameterExpression), invocationParameterExpression).Compile();
+                return t;
+            });
         }
 
         private IDictionary<string, string> GetTemplateArguments(MethodDescriptor methodDescriptor, IDictionary<string, object> arguments)
@@ -131,27 +128,48 @@ namespace Rabbit.Feign.Reflective
             }
         }
 
+        private static HttpMethod GetHttpMethod(string method)
+        {
+            if (string.Equals(method, "Get", StringComparison.OrdinalIgnoreCase)) return HttpMethod.Get;
+            if (string.Equals(method, "Delete", StringComparison.OrdinalIgnoreCase)) return HttpMethod.Delete;
+            if (string.Equals(method, "Head", StringComparison.OrdinalIgnoreCase)) return HttpMethod.Head;
+            if (string.Equals(method, "Options", StringComparison.OrdinalIgnoreCase)) return HttpMethod.Options;
+            if (string.Equals(method, "Post", StringComparison.OrdinalIgnoreCase)) return HttpMethod.Post;
+            if (string.Equals(method, "Put", StringComparison.OrdinalIgnoreCase)) return HttpMethod.Put;
+            if (string.Equals(method, "Trace", StringComparison.OrdinalIgnoreCase)) return HttpMethod.Trace;
+
+            return new HttpMethod(method);
+        }
+
         private async Task<object> DoHandleAsync(IInvocation invocation)
+        {
+            var type = _clientDescriptor.Type;
+            var method = invocation.Method;
+            var returnType = method.ReturnType;
+            var methodDescriptorTable = _clientDescriptor.MethodDescriptorTable;
+            var methodDescriptor = methodDescriptorTable.Get(type, method);
+
+            var response = await SendAsync(invocation, methodDescriptor);
+
+            var isTask = typeof(Task).IsAssignableFrom(returnType);
+            var realReturnType = isTask && returnType.IsGenericType ? returnType.GenericTypeArguments[0] : (isTask ? null : returnType);
+            var result = await methodDescriptor.Decoder.DecodeAsync(response, realReturnType);
+
+            return result;
+        }
+
+        private async Task<HttpResponseMessage> SendAsync(IInvocation invocation, MethodDescriptor methodDescriptor)
         {
             var type = _clientDescriptor.Type;
             var arguments = invocation.Arguments;
             var method = invocation.Method;
-            var returnType = method.ReturnType;
-
-            var isTask = typeof(Task).IsAssignableFrom(returnType);
-
-            var realReturnType = isTask && returnType.IsGenericType ? returnType.GenericTypeArguments[0] : (isTask ? null : returnType);
-
-            var methodDescriptorTable = _clientDescriptor.MethodDescriptorTable;
-
-            var methodDescriptor = methodDescriptorTable.Get(type, method);
 
             var request = new HttpRequestMessage
             {
-                Method = new HttpMethod(methodDescriptor.RequestMethod)
+                Method = GetHttpMethod(methodDescriptor.RequestMethod)
             };
 
-            IDictionary<string, object> argumentDictionary = new Dictionary<string, object>();
+            IDictionary<string, object> argumentDictionary = new Dictionary<string, object>(arguments.Length);
 
             for (var i = 0; i < arguments.Length; i++)
             {
@@ -169,11 +187,7 @@ namespace Rabbit.Feign.Reflective
                 await methodDescriptor.Encoder.EncodeAsync(argumentDictionary[bodyParameterDescriptor.Name], bodyParameterDescriptor.ParameterType, request);
             }
 
-            var resposne = await _httpClient.SendAsync(request);
-
-            var result = await methodDescriptor.Decoder.DecodeAsync(resposne, realReturnType);
-
-            return result;
+            return await _httpClient.SendAsync(request);
         }
     }
 }

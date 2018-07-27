@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Steeltoe.CircuitBreaker.Hystrix;
+﻿using Steeltoe.CircuitBreaker.Hystrix;
 using System;
 using System.Threading.Tasks;
 
@@ -7,19 +6,14 @@ namespace Rabbit.Feign.Hystrix
 {
     public class SimpleHystrixCommand<T> : HystrixCommand<T>
     {
-        private readonly Func<Task<T>> _runAsync;
-        private readonly Func<Task<T>> _fallbackAsync;
-        private readonly ILogger _logger;
+        private readonly Func<object> _genRun;
 
-        public SimpleHystrixCommand(IHystrixCommandOptions options, Func<T> run, Func<T> fallback, ILogger logger = null) : base(options, run, fallback, logger)
-        {
-        }
+        private readonly Func<object> _genFallback;
 
-        public SimpleHystrixCommand(IHystrixCommandOptions options, Func<Task<T>> runAsync, Func<Task<T>> fallbackAsync, ILogger logger = null) : base(options, null, null, logger)
+        public SimpleHystrixCommand(IHystrixCommandOptions options, Func<object> run, Func<object> fallback) : base(options)
         {
-            _runAsync = runAsync;
-            _fallbackAsync = fallbackAsync;
-            _logger = logger;
+            _genRun = run;
+            _genFallback = fallback;
         }
 
         #region Overrides of HystrixCommand<T>
@@ -31,22 +25,42 @@ namespace Rabbit.Feign.Hystrix
         }
 
         /// <inheritdoc/>
-        protected override async Task<T> RunAsync()
+        protected override Task<T> RunAsync()
         {
-            try
+            var result = _genRun();
+
+            if (result is Task<T> task)
             {
-                return await _runAsync();
+                return task;
             }
-            catch (Exception e)
+
+            if (result is T value)
             {
-                _logger.LogError(e, "HystrixCommand run execute fail.");
-                throw;
+                return Task.FromResult(value);
             }
+
+            return Task.FromResult(default(T));
         }
 
         protected override Task<T> RunFallbackAsync()
         {
-            return _fallbackAsync == null ? base.RunFallbackAsync() : _fallbackAsync();
+            if (_genFallback == null)
+            {
+                return base.RunFallbackAsync();
+            }
+            var result = _genFallback();
+
+            if (result is Task<T> task)
+            {
+                return task;
+            }
+
+            if (result is T value)
+            {
+                return Task.FromResult(value);
+            }
+
+            return Task.FromResult(default(T));
         }
 
         #endregion Overrides of HystrixCommand<T>
