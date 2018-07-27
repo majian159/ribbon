@@ -46,26 +46,6 @@ namespace ClientByConsul
                 .AddConsulDiscoveryClient(configuration)
                 .AddRibbonClient(b => b.AddHttpClient().AddConsulDiscovery());
 
-            // use Feign
-            {
-                var feignBuilder = new FeignBuilder(serviceCollection.AddFeign().BuildServiceProvider());
-
-                serviceCollection.AddSingleton(feignBuilder.TargetByAttribute<ITimeService>());
-                var services = serviceCollection.BuildServiceProvider();
-
-                var timeService = services.GetService<ITimeService>();
-
-                while (true)
-                {
-                    Task.Run(async () =>
-                    {
-                        var now = await timeService.GetNowAsync();
-                        Console.WriteLine("Content: " + now);
-                        Console.ReadLine();
-                    }).Wait();
-                }
-            }
-
             // use HttpClient
             {
                 var services = serviceCollection.BuildServiceProvider();

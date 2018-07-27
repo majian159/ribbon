@@ -23,7 +23,7 @@ namespace ServerByConsul
             return WebHost.CreateDefaultBuilder()
                 .UseConfiguration(configuration)
                 .ConfigureAppConfiguration(b => { b.AddJsonFile("server" + serverId + ".json"); })
-                .UseStartup<Startup>()
+                .UseStartup(serverId == 1 ? typeof(Server1Startup) : typeof(Server2Startup))
                 .UseDiscoveryClient();
         }
     }

@@ -7,9 +7,9 @@ using Steeltoe.Management.Endpoint.Health;
 
 namespace ServerByConsul
 {
-    public class Startup
+    public class Server1Startup
     {
-        public Startup(IConfiguration configuration)
+        public Server1Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
@@ -21,7 +21,6 @@ namespace ServerByConsul
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-
             services.AddHealthActuator(Configuration);
             services.AddCloudFoundryActuator(Configuration);
         }
@@ -36,7 +35,6 @@ namespace ServerByConsul
 
             app.UseHealthActuator();
             app.UseCloudFoundryActuator();
-
             app.UseMvcWithDefaultRoute();
         }
     }
