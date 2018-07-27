@@ -24,17 +24,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ribbon.Client.Abstractions"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rabbit.Feign", "src\Rabbit.Feign\Rabbit.Feign.csproj", "{AA900442-5D6D-4830-BF1E-A61509F00A70}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "samples\Server\Server.csproj", "{66A9E36F-F9AB-4D64-9B95-57B8D3224307}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "samples\Server\Server.csproj", "{66A9E36F-F9AB-4D64-9B95-57B8D3224307}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{4ACD3FA2-1EA2-4021-ACC8-6A5B6AA4A147}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "samples\Client\Client.csproj", "{D22688DD-6EEE-4E89-8C35-820D22F0F6E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "samples\Client\Client.csproj", "{D22688DD-6EEE-4E89-8C35-820D22F0F6E4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "consul", "consul", "{2E9CB59E-AF31-4F83-BEC9-05B02D20455A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerByConsul", "samples\consul\ServerByConsul\ServerByConsul.csproj", "{EB0F056E-9BB4-45D5-A27C-789CDA1F618A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerByConsul", "samples\consul\ServerByConsul\ServerByConsul.csproj", "{EB0F056E-9BB4-45D5-A27C-789CDA1F618A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientByConsul", "samples\consul\ClientByConsul\ClientByConsul.csproj", "{9EE55071-77F2-4802-8AFC-684878EDEF5C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientByConsul", "samples\consul\ClientByConsul\ClientByConsul.csproj", "{9EE55071-77F2-4802-8AFC-684878EDEF5C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

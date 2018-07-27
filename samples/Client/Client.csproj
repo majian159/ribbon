@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Rabbit.Feign\Rabbit.Feign.csproj" />
     <ProjectReference Include="..\..\src\Ribbon.Client.Http\Ribbon.Client.Http.csproj" />
   </ItemGroup>
 

@@ -100,4 +100,17 @@ namespace Rabbit.Feign
             return (T)Target(typeof(T), url);
         }
     }
+
+    public static class FeignBuilderExtensions
+    {
+        public static T TargetByAttribute<T>(this FeignBuilder builder)
+        {
+            var feignClientAttribute = typeof(T).GetCustomAttribute<FeignClientAttribute>();
+
+            return builder
+                .ClientName(feignClientAttribute.Name)
+                .FallbackType(feignClientAttribute.FallbackType)
+                .Target<T>();
+        }
+    }
 }
