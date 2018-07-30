@@ -12,7 +12,7 @@ namespace Rabbit.Feign.Hystrix
     {
         private static readonly ConcurrentDictionary<MethodInfo, HystrixCommandCacheEntry> Caches = new ConcurrentDictionary<MethodInfo, HystrixCommandCacheEntry>();
 
-        public static HystrixCommandCacheEntry GetEntry(MethodInfo method, Func<IHystrixCommandOptions> optionsFactory)
+        public static HystrixCommandCacheEntry GetEntry(MethodInfo method, Type fallbackType, Func<IHystrixCommandOptions> optionsFactory)
         {
             return Caches.GetOrAdd(method, k =>
             {
@@ -37,10 +37,13 @@ namespace Rabbit.Feign.Hystrix
 
                 var commandFactory = CreateCommandFactory(returnType);
                 var methodInvoker = CreateInvoker(method);
-                var executeInvoker =
-                    CreateInvoker(commandType.GetMethod("ExecuteAsync", Enumerable.Empty<Type>().ToArray()));
 
-                return new HystrixCommandCacheEntry(commandFactory, methodInvoker, executeInvoker, optionsFactory());
+                var fallbackMethod = fallbackType?.GetMethod(method.Name, method.GetParameters().Select(p => p.ParameterType).ToArray());
+
+                var fallbackMethodInvoker = fallbackMethod == null ? null : CreateInvoker(fallbackMethod);
+                var executeInvoker = CreateInvoker(commandType.GetMethod("ExecuteAsync", Enumerable.Empty<Type>().ToArray()));
+
+                return new HystrixCommandCacheEntry(commandFactory, methodInvoker, fallbackMethodInvoker, executeInvoker, optionsFactory());
             });
         }
 
@@ -96,17 +99,19 @@ namespace Rabbit.Feign.Hystrix
 
         public struct HystrixCommandCacheEntry
         {
-            public HystrixCommandCacheEntry(HystrixCommandFactoryDelegate hystrixCommandFactory, LateBoundMethod methodInvoker, LateBoundMethod executeInvoker, IHystrixCommandOptions options)
+            public HystrixCommandCacheEntry(HystrixCommandFactoryDelegate hystrixCommandFactory, LateBoundMethod methodInvoker, LateBoundMethod fallbackMethodInvoker, LateBoundMethod executeInvoker, IHystrixCommandOptions options)
             {
                 HystrixCommandFactory = hystrixCommandFactory;
                 MethodInvoker = methodInvoker;
                 ExecuteInvoker = executeInvoker;
                 Options = options;
+                FallbackMethodInvoker = fallbackMethodInvoker;
             }
 
             public HystrixCommandFactoryDelegate HystrixCommandFactory { get; }
 
             public LateBoundMethod MethodInvoker { get; }
+            public LateBoundMethod FallbackMethodInvoker { get; }
             public LateBoundMethod ExecuteInvoker { get; }
             public IHystrixCommandOptions Options { get; }
         }

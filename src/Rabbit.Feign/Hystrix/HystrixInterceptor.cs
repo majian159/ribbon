@@ -12,6 +12,7 @@ namespace Rabbit.Feign.Hystrix
     {
         private readonly Type _pryxyType;
         private readonly object _proxyInstance;
+        private readonly Type _fallbackType;
         private readonly IServiceProvider _services;
 
         private readonly Func<object> _fallbackInstanceFactory;
@@ -20,6 +21,7 @@ namespace Rabbit.Feign.Hystrix
         {
             _pryxyType = pryxyType;
             _proxyInstance = proxyInstance;
+            _fallbackType = fallbackType;
 
             if (fallbackType != null)
             {
@@ -43,16 +45,16 @@ namespace Rabbit.Feign.Hystrix
         {
             var method = invocation.Method;
 
-            var cache = HystrixCommandCacheUtilities.GetEntry(method, () => CreateCommandOptions(method));
+            var cache = HystrixCommandCacheUtilities.GetEntry(method, _fallbackType, () => CreateCommandOptions(method));
 
             var arguments = invocation.Arguments;
 
             object RunFunc() => cache.MethodInvoker(_proxyInstance, arguments);
             Func<object> fallbackFunc = null;
 
-            if (_fallbackInstanceFactory != null)
+            if (_fallbackInstanceFactory != null && cache.FallbackMethodInvoker != null)
             {
-                fallbackFunc = () => cache.MethodInvoker(_fallbackInstanceFactory(), arguments);
+                fallbackFunc = () => cache.FallbackMethodInvoker(_fallbackInstanceFactory(), arguments);
             }
 
             var command = cache.HystrixCommandFactory(cache.Options, RunFunc, fallbackFunc);
