@@ -105,12 +105,24 @@ namespace Rabbit.Feign
     {
         public static T TargetByAttribute<T>(this FeignBuilder builder)
         {
-            var feignClientAttribute = typeof(T).GetCustomAttribute<FeignClientAttribute>();
+            return (T)builder.TargetByAttribute(typeof(T));
+        }
+
+        public static object TargetByAttribute(this FeignBuilder builder, Type type)
+        {
+            if (type == null) throw new ArgumentNullException(nameof(type));
+
+            var feignClientAttribute = type.GetCustomAttribute<FeignClientAttribute>();
+
+            if (feignClientAttribute == null)
+            {
+                throw new ArgumentException("can't find FeignClient Attribute.");
+            }
 
             return builder
                 .ClientName(feignClientAttribute.Name)
                 .FallbackType(feignClientAttribute.FallbackType)
-                .Target<T>();
+                .Target(type);
         }
     }
 }
