@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,7 +13,7 @@ namespace Ribbon.LoadBalancer.Impl.ServerList
 
         protected bool Processing { get; set; }
 
-        public PollingServerListUpdater(LoadBalancerConfig config)
+        public PollingServerListUpdater(LoadBalancerConfig config, ILogger logger)
         {
             _config = config;
             _timer = new Timer(async s =>
@@ -27,6 +28,10 @@ namespace Ribbon.LoadBalancer.Impl.ServerList
                 try
                 {
                     await UpdateAction();
+                }
+                catch (Exception e)
+                {
+                    logger.LogWarning(e, "Failed one update cycle");
                 }
                 finally
                 {
@@ -44,7 +49,7 @@ namespace Ribbon.LoadBalancer.Impl.ServerList
 
             if (updateAction == null)
             {
-                _timer.Change(-1, -1);
+                _timer.Change(Timeout.Infinite, Timeout.Infinite);
             }
             else
             {
@@ -55,7 +60,7 @@ namespace Ribbon.LoadBalancer.Impl.ServerList
         /// <inheritdoc/>
         public virtual void Stop()
         {
-            _timer.Change(TimeSpan.MinValue, TimeSpan.MinValue);
+            _timer.Change(Timeout.Infinite, Timeout.Infinite);
         }
 
         #endregion Implementation of IServerListUpdater

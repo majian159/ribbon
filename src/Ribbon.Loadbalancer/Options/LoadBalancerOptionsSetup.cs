@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ribbon.LoadBalancer.Impl.Rule;
 using Ribbon.LoadBalancer.Impl.ServerList;
@@ -75,7 +76,8 @@ namespace Ribbon.LoadBalancer
 
             if (options.ServerListUpdater == null && !(options.ServerList is ConfigurationBasedServerList))
             {
-                options.ServerListUpdater = new PollingServerListUpdater(settings);
+                options.ServerListUpdater = new PollingServerListUpdater(settings,
+                    _services.GetRequiredService<ILoggerFactory>().CreateLogger<PollingServerListUpdater>());
             }
         }
 
