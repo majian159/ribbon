@@ -57,6 +57,12 @@ namespace Rabbit.Feign.Reflective
         private async Task<T> HandleAsync<T>(IInvocation invocation)
         {
             var result = await DoHandleAsync(invocation);
+
+            if (result == null)
+            {
+                return default(T);
+            }
+
             return (T)result;
         }
 
@@ -160,7 +166,6 @@ namespace Rabbit.Feign.Reflective
 
         private async Task<HttpResponseMessage> SendAsync(IInvocation invocation, MethodDescriptor methodDescriptor)
         {
-            var type = _clientDescriptor.Type;
             var arguments = invocation.Arguments;
             var method = invocation.Method;
 

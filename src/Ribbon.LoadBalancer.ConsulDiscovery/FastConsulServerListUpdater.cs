@@ -17,7 +17,7 @@ namespace Ribbon.LoadBalancer.ConsulDiscovery
         private ILogger<FastConsulServerListUpdater> _logger;
 
         /// <inheritdoc/>
-        public FastConsulServerListUpdater(string clientName, IServiceProvider services, LoadBalancerConfig config) : base(config)
+        public FastConsulServerListUpdater(string clientName, IServiceProvider services, LoadBalancerConfig config, ILogger logger) : base(config, logger)
         {
             _clientName = clientName;
             _logger = services.GetRequiredService<ILogger<FastConsulServerListUpdater>>();
