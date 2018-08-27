@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
+using Steeltoe.CircuitBreaker.Hystrix.Exceptions;
 using System;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -16,11 +18,6 @@ namespace Rabbit.Feign.Codec
         {
             var statusCode = (int)response.StatusCode;
 
-            if (statusCode == 404)
-            {
-                return null;
-            }
-
             if (response.RequestMessage.Method == HttpMethod.Head && type == typeof(bool))
             {
                 if (statusCode == 404)
@@ -33,6 +30,18 @@ namespace Rabbit.Feign.Codec
                 }
             }
 
+            if (type != null && type.IsClass && statusCode == 404)
+            {
+                return null;
+            }
+
+            var bodyString = await ReadAsStringAsync(response);
+
+            if (!response.IsSuccessStatusCode && statusCode >= 400 && statusCode < 500)
+            {
+                throw new HystrixBadRequestException($"Response status code does not indicate success: ${statusCode} ({response.ReasonPhrase}),Content: {bodyString}.");
+            }
+
             response.EnsureSuccessStatusCode();
 
             if (type == null || type == typeof(Task) || type == typeof(void))
@@ -40,10 +49,28 @@ namespace Rabbit.Feign.Codec
                 return null;
             }
 
-            var json = await response.Content.ReadAsStringAsync();
+            var json = bodyString;
             return JsonConvert.DeserializeObject(json, type);
         }
 
         #endregion Implementation of IDecoder
+
+        private static async Task<string> ReadAsStringAsync(HttpResponseMessage message)
+        {
+            if (message?.Content == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return await message.Content.ReadAsStringAsync();
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("read string error:" + e.Message);
+                return null;
+            }
+        }
     }
 }
