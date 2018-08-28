@@ -7,8 +7,6 @@ namespace Rabbit.Feign.Codec
 {
     public class DefaultEncoder : IEncoder
     {
-        public static readonly DefaultEncoder Default = new DefaultEncoder();
-
         #region Implementation of IEncoder
 
         /// <inheritdoc/>

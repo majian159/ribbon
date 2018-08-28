@@ -4,12 +4,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Steeltoe.CircuitBreaker.Hystrix;
 using Steeltoe.CircuitBreaker.Hystrix.Strategy;
 using System;
+using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace Rabbit.Feign.Hystrix
 {
     public class HystrixInterceptor : IInterceptor
     {
+        private readonly string _clientName;
         private readonly Type _pryxyType;
         private readonly object _proxyInstance;
         private readonly Type _fallbackType;
@@ -17,8 +20,9 @@ namespace Rabbit.Feign.Hystrix
 
         private readonly Func<object> _fallbackInstanceFactory;
 
-        public HystrixInterceptor(Type pryxyType, object proxyInstance, Type fallbackType, IServiceProvider services)
+        public HystrixInterceptor(string clientName, Type pryxyType, object proxyInstance, Type fallbackType, IServiceProvider services)
         {
+            _clientName = clientName;
             _pryxyType = pryxyType;
             _proxyInstance = proxyInstance;
             _fallbackType = fallbackType;
@@ -62,10 +66,10 @@ namespace Rabbit.Feign.Hystrix
             return cache.ExecuteInvoker(command, null);
         }
 
-        private IHystrixCommandOptions CreateCommandOptions(MemberInfo method)
+        private IHystrixCommandOptions CreateCommandOptions(MethodBase method)
         {
-            var groupKeyName = _pryxyType.Name;
-            var commandKeyName = method.Name;
+            var groupKeyName = _clientName;
+            var commandKeyName = GetCommandKey(_pryxyType, method);
 
             var groupKey = HystrixCommandGroupKeyDefault.AsKey(groupKeyName);
             var commandKey = HystrixCommandKeyDefault.AsKey(commandKeyName);
@@ -79,6 +83,26 @@ namespace Rabbit.Feign.Hystrix
             };
 
             return opts;
+        }
+
+        private static string GetCommandKey(MemberInfo targetType, MethodBase method)
+        {
+            var builder = new StringBuilder();
+            builder.Append(targetType.Name).Append("#").Append(method.Name).Append("(");
+
+            var parameters = method.GetParameters();
+
+            foreach (var parameterInfo in parameters)
+            {
+                builder.Append(parameterInfo.ParameterType.Name).Append(",");
+            }
+
+            if (parameters.Any())
+            {
+                builder.Remove(builder.Length - 1, 1);
+            }
+
+            return builder.Append(")").ToString();
         }
     }
 }

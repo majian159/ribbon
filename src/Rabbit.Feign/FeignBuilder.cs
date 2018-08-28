@@ -15,14 +15,16 @@ namespace Rabbit.Feign
         private readonly IServiceProvider _services;
         private static readonly ProxyGenerator ProxyGenerator = new ProxyGenerator();
 
-        private IEncoder _encoder = DefaultEncoder.Default;
-        private IDecoder _decoder = DefaultDecoder.Default;
+        private IEncoder _encoder;
+        private IDecoder _decoder;
         private string _clientName;
         private Type _fallbackType;
 
         public FeignBuilder(IServiceProvider services)
         {
             _services = services;
+            _encoder = _services.GetService<IEncoder>();
+            _decoder = _services.GetService<IDecoder>();
         }
 
         public FeignBuilder Encoder(IEncoder encoder)
@@ -87,7 +89,7 @@ namespace Rabbit.Feign
             var feignProxy = ProxyGenerator.CreateInterfaceProxyWithoutTarget(type, Enumerable.Empty<Type>().ToArray(), goInterceptor);
 
             return ProxyGenerator.CreateInterfaceProxyWithTarget(type, feignProxy,
-                new HystrixInterceptor(type, feignProxy, _fallbackType, _services));
+                new HystrixInterceptor(_clientName, type, feignProxy, _fallbackType, _services));
         }
 
         public T Target<T>()

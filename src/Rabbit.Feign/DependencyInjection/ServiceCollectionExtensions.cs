@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Rabbit.Feign.Codec;
 using Rabbit.Feign.Reflective;
 using System;
 
@@ -15,7 +16,9 @@ namespace Rabbit.Feign
 
             services
                 .AddTransient<FeignBuilder>()
-                .AddSingleton<IParameterExpanderLocator, ParameterExpanderLocator>();
+                .AddSingleton<IParameterExpanderLocator, ParameterExpanderLocator>()
+                .AddSingleton<IEncoder, DefaultEncoder>()
+                .AddSingleton<IDecoder, DefaultDecoder>();
 
             return services;
         }
