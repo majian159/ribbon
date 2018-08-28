@@ -30,7 +30,7 @@ namespace Rabbit.Feign.Codec
                 }
             }
 
-            if (type != null && type.IsClass && statusCode == 404)
+            if (type != null && !type.IsValueType && statusCode == 404)
             {
                 return null;
             }
