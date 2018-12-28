@@ -1,13 +1,13 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Rabbit.Feign;
 using Ribbon.Client;
 using Ribbon.Client.Http;
 using Ribbon.LoadBalancer.ConsulDiscovery;
 using Steeltoe.Discovery.Consul.Client;
-using System;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace ClientByConsul
 {
@@ -18,17 +18,12 @@ namespace ClientByConsul
         Task<DateTime> GetNowAsync();
     }
 
-    public class TimeServiceFallback : ITimeService
+    public class TimeServiceFallback
     {
-        #region Implementation of ITimeService
-
-        /// <inheritdoc/>
         public Task<DateTime> GetNowAsync()
         {
             return Task.FromResult(DateTime.MinValue);
         }
-
-        #endregion Implementation of ITimeService
     }
 
     internal class Program
@@ -45,6 +40,26 @@ namespace ClientByConsul
                 .AddSingleton<IConfiguration>(configuration)
                 .AddConsulDiscoveryClient(configuration)
                 .AddRibbonClient(b => b.AddHttpClient().AddConsulDiscovery());
+
+            // use Feign
+            {
+                var feignBuilder = new FeignBuilder(serviceCollection.AddFeign().BuildServiceProvider());
+
+                serviceCollection.AddSingleton(feignBuilder.TargetByAttribute<ITimeService>());
+                var services = serviceCollection.BuildServiceProvider();
+
+                var timeService = services.GetService<ITimeService>();
+
+                while (true)
+                {
+                    Task.Run(async () =>
+                    {
+                        var now = await timeService.GetNowAsync();
+                        Console.WriteLine("Content: " + now);
+                        Console.ReadLine();
+                    }).Wait();
+                }
+            }
 
             // use HttpClient
             {
